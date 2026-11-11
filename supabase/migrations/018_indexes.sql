@@ -1,0 +1,3 @@
+-- Task 18: Indexes optimisés (déjà créés dans migrations précédentes, cette migration est pour référence)
+-- Les indexes ont été créés lors de la création des tables
+-- Cette migration est vide car tous les indexes sont créés inline

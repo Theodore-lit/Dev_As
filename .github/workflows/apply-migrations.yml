@@ -1,0 +1,25 @@
+name: Apply Migrations to Supabase
+
+on:
+  workflow_dispatch:  # Manuel via GitHub UI
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/migrations/**'
+
+jobs:
+  apply-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Supabase CLI
+        run: npm install -g @supabase/cli
+      
+      - name: Apply migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase link --project-ref vnuxmopaahgprmwhndke
+          supabase db push
