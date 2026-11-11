@@ -160,20 +160,57 @@ if (!activeEdition) {
 
 ## 5. Configuration Next.js 16 & Rendu Dynamique
 
-### Règle pour forcer le rendu dynamique : `await connection()`
-Dans Next.js 15+ et 16, **ne pas utiliser** `export const dynamic = "force-dynamic"`. Utiliser plutôt l'API officielle `connection()` de `next/server` au début de la fonction de la page :
+### Règle ABSOLUE : `cacheComponents: true` incompatible avec les route segment configs
+Avec `cacheComponents: true` dans `next.config.ts`, **les exports suivants sont INTERDITS dans tout fichier page/layout** car ils causent une erreur de build :
+- `export const dynamic = '...'`
+- `export const revalidate = ...`
+- `export const fetchCache = '...'`
+
+### Méthode officielle : `io()` + `<Suspense>` (Next.js 16 avec cacheComponents)
+
+Le pattern recommandé par la doc officielle **pour ce projet** est `await io()` depuis `next/cache`, wrappé dans un composant async séparé derrière une `<Suspense>` boundary. C'est **plus performant** que `connection()` car le shell statique est prérendu et streamé immédiatement, seul le contenu dynamique est différé.
 
 ```typescript
-import { connection } from 'next/server';
+// ✅ Pattern CORRECT — À utiliser dans toutes les pages de ce projet
+import { Suspense } from 'react';
+import { io } from 'next/cache';
+import { createClient } from '@/src/utils/supabase/server';
 
-export default async function MaPage() {
-  await connection();
-  // ...
+// Page : shell statique (rendu immédiat, prefetchable)
+export default function MaPage() {
+  return (
+    <Suspense fallback={<MonSkeleton />}>
+      <MonContenuDynamique />
+    </Suspense>
+  );
+}
+
+// Squelette affiché pendant le streaming
+function MonSkeleton() {
+  return <div className="animate-pulse h-32 rounded-2xl bg-line/40" />;
+}
+
+// Composant async qui fait le vrai fetch — exécuté hors prerender
+async function MonContenuDynamique() {
+  await io(); // suspend le prerender ici, force l'exécution côté serveur à la requête
+  const supabase = await createClient();
+  const { data } = await supabase.from('ma_table').select('*');
+  return <div>{/* ... rendu avec data */}</div>;
 }
 ```
 
+### Comparaison des approches (pour référence)
+
+| Méthode | Compatible `cacheComponents` | Usage |
+|---------|---|---|
+| `export const dynamic = 'force-dynamic'` | ❌ Erreur de build | Interdit |
+| `export const revalidate = X` | ❌ Erreur de build | Interdit |
+| `unstable_noStore()` | ⚠️ Deprecated v15 | Interdit (legacy) |
+| `await connection()` | ✅ Fonctionne | Bloque aussi les prefetches — éviter |
+| **`await io()` + `<Suspense>`** | ✅ **Optimal** | **À utiliser** dans tout ce projet |
+
 ### Configuration `next.config.ts`
-Si `partialPrefetching: true` est présent dans la configuration, **il est obligatoire de conserver `cacheComponents: true`** :
+`partialPrefetching: true` requiert `cacheComponents: true`. Ces deux flags doivent toujours être présents ensemble :
 
 ```typescript
 const nextConfig: NextConfig = {

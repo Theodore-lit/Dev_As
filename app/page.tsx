@@ -1,4 +1,5 @@
-import { connection } from 'next/server';
+import { Suspense } from 'react';
+import { io } from 'next/cache';
 import { createClient } from '@/src/utils/supabase/server';
 import { HeroSection } from '@/src/components/home/hero-section';
 import { TournamentBracket } from '@/src/components/home/tournament-bracket';
@@ -16,83 +17,12 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  // Signals to Next.js that this page is dynamic (reads cookies via Supabase)
-  await connection();
-
-  const supabase = await createClient();
-
-  // 1. Récupération de l'édition en cours depuis le backend (conforme à la page de candidature)
-  const { data: openEdition } = await supabase
-    .from('editions')
-    .select('*')
-    .eq('candidatures_ouvertes', true)
-    .order('annee', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  let activeEdition = openEdition;
-
-  // Si aucune édition avec candidatures_ouvertes n'est active, on cherche celle en cours
-  if (!activeEdition) {
-    const { data: inProgressEdition } = await supabase
-      .from('editions')
-      .select('*')
-      .eq('statut', 'en_cours')
-      .order('annee', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    activeEdition = inProgressEdition;
-  }
-
-  // Repli sur l'édition la plus récente
-  if (!activeEdition) {
-    const { data: latestEdition } = await supabase
-      .from('editions')
-      .select('*')
-      .order('annee', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    activeEdition = latestEdition;
-  }
-
-  // 2. Décompte global des éditions
-  const { data: allEditions } = await supabase
-    .from('editions')
-    .select('id');
-  const totalEditions = allEditions?.length || 4;
-
-  // 3. Récupération dynamique des métriques backend pour l'édition en cours
-  let candidaturesCount = 0;
-  let participantsCount = 0;
-  let phasesCount = 0;
-
-  if (activeEdition) {
-    const [candidaturesRes, participantsRes, phasesRes] = await Promise.all([
-      supabase
-        .from('candidatures')
-        .select('*', { count: 'exact', head: true })
-        .eq('edition_id', activeEdition.id),
-      supabase
-        .from('participants')
-        .select('*', { count: 'exact', head: true })
-        .eq('edition_id', activeEdition.id),
-      supabase
-        .from('phases')
-        .select('*', { count: 'exact', head: true })
-        .eq('edition_id', activeEdition.id),
-    ]);
-
-    candidaturesCount = candidaturesRes.count || 0;
-    participantsCount = participantsRes.count || 0;
-    phasesCount = phasesRes.count || 0;
-  }
-
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* 1. Hero agrandi avec atouts et décors immersifs (Fidèle à la maquette) */}
-      <HeroSection totalEditions={totalEditions} />
+    <div className="flex flex-col">
+      {/* 1. Hero agrandi avec atouts et décors immersifs */}
+      <HeroSection totalEditions={4} />
 
-      {/* 2. Présentation officielle du concours (Directement après le Hero) */}
+      {/* 2. Présentation officielle du concours */}
       <section id="competition" className="py-16 md:py-24 bg-soft/30 scroll-mt-16">
         <div className="max-w-[1180px] mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center mb-16">
@@ -141,29 +71,109 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Schéma officiel de déroulement de la compétition (Arbre façon football / Ligue des Champions) */}
+          {/* Schéma officiel de déroulement (Arbre façon football / Ligue des Champions) */}
           <div className="bg-white rounded-3xl border border-line p-6 sm:p-8 md:p-10 shadow-xs">
             <TournamentBracket />
           </div>
         </div>
       </section>
 
-      {/* 3. Récompenses officielles du concours */}
+      {/* 3. Récompenses officielles */}
       <RewardsSection />
 
-      {/* 4. Principes d'organisation et d'équité */}
+      {/* 4. Principes d'organisation */}
       <PrinciplesSection />
 
-      {/* 5. Édition en cours (Données 100% dynamiques de Supabase) */}
-      <ActiveEditionSection
-        edition={activeEdition}
-        candidaturesCount={candidaturesCount}
-        participantsCount={participantsCount}
-        phasesCount={phasesCount}
-      />
+      {/* 5. Édition en cours — données dynamiques via io() + Suspense */}
+      <Suspense fallback={<ActiveEditionSkeleton />}>
+        <ActiveEditionDynamic />
+      </Suspense>
 
-      {/* 6. Bandeau CTA final fidèle à la maquette */}
+      {/* 6. Bandeau CTA final */}
       <CtaSection />
     </div>
+  );
+}
+
+/** Squelette affiché pendant le streaming de l'édition active */
+function ActiveEditionSkeleton() {
+  return (
+    <section className="py-16 md:py-20 bg-soft/50">
+      <div className="max-w-[1180px] mx-auto px-4">
+        <div className="animate-pulse h-48 rounded-3xl bg-line/40" />
+      </div>
+    </section>
+  );
+}
+
+/** Composant serveur dynamique — se charge via io() hors du shell statique */
+async function ActiveEditionDynamic() {
+  await io();
+
+  const supabase = await createClient();
+
+  // Priorité : candidatures_ouvertes → en_cours → la plus récente
+  const { data: openEdition } = await supabase
+    .from('editions')
+    .select('*')
+    .eq('candidatures_ouvertes', true)
+    .order('annee', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let activeEdition = openEdition;
+
+  if (!activeEdition) {
+    const { data: inProgress } = await supabase
+      .from('editions')
+      .select('*')
+      .eq('statut', 'en_cours')
+      .order('annee', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    activeEdition = inProgress;
+  }
+
+  if (!activeEdition) {
+    const { data: latest } = await supabase
+      .from('editions')
+      .select('*')
+      .order('annee', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    activeEdition = latest;
+  }
+
+  let candidaturesCount = 0;
+  let participantsCount = 0;
+  let phasesCount = 0;
+
+  if (activeEdition) {
+    const [candRes, partRes, phasRes] = await Promise.all([
+      supabase
+        .from('candidatures')
+        .select('*', { count: 'exact', head: true })
+        .eq('edition_id', activeEdition.id),
+      supabase
+        .from('participants')
+        .select('*', { count: 'exact', head: true })
+        .eq('edition_id', activeEdition.id),
+      supabase
+        .from('phases')
+        .select('*', { count: 'exact', head: true })
+        .eq('edition_id', activeEdition.id),
+    ]);
+    candidaturesCount = candRes.count ?? 0;
+    participantsCount = partRes.count ?? 0;
+    phasesCount = phasRes.count ?? 0;
+  }
+
+  return (
+    <ActiveEditionSection
+      edition={activeEdition}
+      candidaturesCount={candidaturesCount}
+      participantsCount={participantsCount}
+      phasesCount={phasesCount}
+    />
   );
 }

@@ -2,7 +2,7 @@
 
 BEGIN;
 
-SELECT plan(6);
+SELECT plan(8);
 
 -- Test 1: Anonyme ne voit pas les emails des participants
 SELECT ok(
@@ -27,7 +27,33 @@ SELECT ok(
   'Vue participants_publics sans données sensibles'
 );
 
--- Test 3: Scores en direct visible (en_cours)
+-- Test 3: Vue publique des candidatures sans données de contact ou de suivi
+SELECT ok(
+  NOT EXISTS (
+    SELECT column_name FROM information_schema.columns
+    WHERE table_name = 'v_candidatures_publiques'
+    AND column_name IN (
+      'email',
+      'telephone',
+      'date_naissance',
+      'code_suivi',
+      'commentaire_interne'
+    )
+  ),
+  'Vue candidatures_publiques sans données sensibles'
+);
+
+-- Test 4: Vue publique du palmarès sans données sensibles
+SELECT ok(
+  NOT EXISTS (
+    SELECT column_name FROM information_schema.columns
+    WHERE table_name = 'v_palmares_publics'
+    AND column_name IN ('email', 'telephone', 'date_naissance')
+  ),
+  'Vue palmares_publics sans données sensibles'
+);
+
+-- Test 5: Scores en direct visible (en_cours)
 SELECT ok(
   EXISTS (
     SELECT 1 FROM matchs WHERE statut = 'en_cours'::statut_match LIMIT 1
@@ -35,7 +61,7 @@ SELECT ok(
   'Matchs en_cours existent'
 );
 
--- Test 4: Issue NULL avant validation (vue expose pas issue non validée)
+-- Test 6: Issue NULL avant validation (vue expose pas issue non validée)
 SELECT ok(
   NOT EXISTS (
     SELECT 1 FROM resultats
@@ -45,7 +71,7 @@ SELECT ok(
   'Issues non renseignées avant validation'
 );
 
--- Test 5: Journal d'activité inaccessible anonyme
+-- Test 7: Journal d'activité inaccessible anonyme
 SELECT ok(
   NOT EXISTS (
     SELECT column_name FROM information_schema.tables 
@@ -54,7 +80,7 @@ SELECT ok(
   'Journal d\'activité existe'
 );
 
--- Test 6: RLS activé sur toutes tables sensibles
+-- Test 8: RLS activé sur toutes tables sensibles
 SELECT is(
   (SELECT COUNT(*) FROM information_schema.tables 
    WHERE table_schema = 'public' 

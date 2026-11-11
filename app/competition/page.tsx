@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { connection } from 'next/server';
+import { Suspense } from 'react';
+import { io } from 'next/cache';
 import { createClient } from '@/src/utils/supabase/server';
 import { TournamentBracket } from '@/src/components/home/tournament-bracket';
 import { RewardsSection } from '@/src/components/home/rewards-section';
@@ -33,8 +34,32 @@ const REGIE_MEMBERS = [
   { name: 'OROPONDE Christelle', role: 'Régie financière', initials: 'OC' },
 ];
 
-export default async function CompetitionPage() {
-  await connection();
+export default function CompetitionPage() {
+  return (
+    <Suspense fallback={<CompetitionSkeleton />}>
+      <CompetitionDynamic />
+    </Suspense>
+  );
+}
+
+function CompetitionSkeleton() {
+  return (
+    <div className="flex flex-col bg-white">
+      <div className="bg-gradient-to-b from-soft/80 via-white to-white border-b border-line py-10 md:py-14">
+        <div className="max-w-[1180px] mx-auto px-4">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 w-48 bg-line/60 rounded" />
+            <div className="h-10 w-96 bg-line/60 rounded" />
+            <div className="h-4 w-72 bg-line/60 rounded" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function CompetitionDynamic() {
+  await io();
   const supabase = await createClient();
 
   // 1. Récupération de l'édition active depuis le backend
@@ -90,8 +115,9 @@ export default async function CompetitionPage() {
   const isCandidaturesOpen = activeEdition?.candidatures_ouvertes || activeEdition?.statut === 'candidatures_ouvertes';
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* ── 1. En-tête épuré de sous-page (Design Institutionnel & Accès Rapide) ── */}
+    <div className="flex flex-col bg-white">
+          
+      {/* ── 2. En-tête épuré de sous-page (Design Institutionnel & Accès Rapide) ── */}
       <section className="bg-gradient-to-b from-soft/80 via-white to-white border-b border-line py-10 md:py-14">
         <div className="max-w-[1180px] mx-auto px-4">
           {/* Fil d'Ariane */}
@@ -147,20 +173,6 @@ export default async function CompetitionPage() {
           </div>
         </div>
       </section>
-
-      {/* ── 2. Schéma de déroulement façon tournoi (14 Matchs compacts) ── */}
-      <section id="tableau" className="py-14 md:py-18 bg-white scroll-mt-12">
-        <div className="max-w-[1180px] mx-auto px-4">
-          <div className="bg-white rounded-3xl border border-line p-6 sm:p-8 md:p-10 shadow-xs">
-            <TournamentBracket />
-          </div>
-        </div>
-      </section>
-
-      {/* ── 3. Récompenses officielles du Podium ── */}
-      <div id="recompenses" className="scroll-mt-12">
-        <RewardsSection />
-      </div>
 
       {/* ── 4. Principes d'organisation et d'équité ── */}
       <section id="principes" className="py-14 md:py-18 bg-soft/40 border-y border-line scroll-mt-12">
@@ -362,10 +374,10 @@ export default async function CompetitionPage() {
                   ))}
                 </div>
 
-                <div className="mt-4 p-2.5 rounded-xl bg-white/80 border border-amber-200/60 text-[0.72rem] text-amber-900 flex items-center gap-2">
+                {/* <div className="mt-4 p-2.5 rounded-xl bg-white/80 border border-amber-200/60 text-[0.72rem] text-amber-900 flex items-center gap-2">
                   <ShieldCheckIcon className="w-4 h-4 text-amber-700 shrink-0" />
                   <span>Un reçu officiel ou une validation de paiement vous sera délivré pour confirmer votre place.</span>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -451,6 +463,22 @@ export default async function CompetitionPage() {
           </div>
         </div>
       </section>
+
+      {/* ── 3. Récompenses officielles du Podium ── */}
+      <div id="recompenses" className="scroll-mt-12">
+        <RewardsSection />
+      </div>
+
+      {/* ── 1. Schéma de déroulement façon tournoi (14 Matchs compacts) ── */}
+      <section id="tableau" className="py-14 md:py-18 bg-white scroll-mt-12">
+        <div className="max-w-[1180px] mx-auto px-4">
+          <div className="bg-white rounded-3xl border border-line p-6 sm:p-8 md:p-10 shadow-xs">
+            <TournamentBracket />
+          </div>
+        </div>
+      </section>
+
+      
 
       {/* ── 6. CTA final ── */}
       <section className="relative overflow-hidden bg-gradient-to-r from-[#013517] via-[#025024] to-[#012812] py-14 md:py-16 text-white border-t border-green-900">

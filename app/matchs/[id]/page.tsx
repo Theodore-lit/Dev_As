@@ -101,7 +101,7 @@ export default async function MatchDetailPage({
     })) || [];
 
     return (
-      <div className="min-h-screen bg-white">
+      <div className="bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <MatchDetail
             match={match}
@@ -119,7 +119,7 @@ export default async function MatchDetailPage({
   } catch (error) {
     console.error('Error fetching match:', error);
     return (
-      <div className="min-h-screen bg-white">
+      <div className="bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <ErrorState
             title="Erreur lors du chargement"

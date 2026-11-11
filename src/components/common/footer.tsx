@@ -2,19 +2,18 @@ import React from 'react';
 import Link from 'next/link';
 
 export function Footer() {
-  // Use a fixed year for consistency, or calculate at build time
   const currentYear = 2026;
 
   return (
-    <footer className="border-t border-gray-200 bg-gray-50 mt-12">
-      <div className="container mx-auto px-4 py-8">
+    <footer className="mt-auto border-t border-line bg-soft">
+      <div className="mx-auto w-full max-w-[1180px] px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* About */}
           <div>
-            <h3 className="font-semibold text-neutral-dark mb-4">
+            <h3 className="font-semibold text-ink mb-4">
               Question pour un DevChampion
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-mute">
               Une compétition intellectuelle de culture générale pour les
               jeunes talents.
             </p>
@@ -22,12 +21,12 @@ export function Footer() {
 
           {/* Links */}
           <div>
-            <h4 className="font-semibold text-neutral-dark mb-4">Liens</h4>
+            <h4 className="font-semibold text-ink mb-4">Liens</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/editions"
-                  className="text-gray-600 hover:text-brand-primary transition-colors"
+                  className="text-mute hover:text-green-dark transition-colors"
                 >
                   Éditions
                 </Link>
@@ -35,7 +34,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/participants"
-                  className="text-gray-600 hover:text-brand-primary transition-colors"
+                  className="text-mute hover:text-green-dark transition-colors"
                 >
                   Participants
                 </Link>
@@ -43,7 +42,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/palmares"
-                  className="text-gray-600 hover:text-brand-primary transition-colors"
+                  className="text-mute hover:text-green-dark transition-colors"
                 >
                   Palmarès
                 </Link>
@@ -53,12 +52,12 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="font-semibold text-neutral-dark mb-4">Légal</h4>
+            <h4 className="font-semibold text-ink mb-4">Légal</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-brand-primary transition-colors"
+                  className="text-mute hover:text-green-dark transition-colors"
                 >
                   Mentions légales
                 </a>
@@ -66,7 +65,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-brand-primary transition-colors"
+                  className="text-mute hover:text-green-dark transition-colors"
                 >
                   Politique de confidentialité
                 </a>
@@ -76,7 +75,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-gray-200 pt-6 text-center text-sm text-gray-600">
+        <div className="border-t border-line pt-6 text-center text-sm text-mute">
           <p>
             &copy; {currentYear} Question pour un DevAs. Tous droits réservés.
           </p>

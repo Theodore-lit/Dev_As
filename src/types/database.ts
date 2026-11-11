@@ -876,34 +876,52 @@ export type Database = {
       }
       v_participants_publics: {
         Row: {
-          classe_niveau: string | null
-          etablissement: string | null
-          id: string | null
-          nom: string | null
-          numero: number | null
+          classe_niveau: string
+          edition_id: string
+          etablissement: string
+          id: string
+          nom: string
+          numero: number
           photo_path: string | null
-          prenom: string | null
-          statut: Database["public"]["Enums"]["statut_participant"] | null
+          prenom: string
+          statut: Database["public"]["Enums"]["statut_participant"]
         }
-        Insert: {
-          classe_niveau?: string | null
-          etablissement?: string | null
-          id?: string | null
-          nom?: string | null
-          numero?: number | null
-          photo_path?: string | null
-          prenom?: string | null
-          statut?: Database["public"]["Enums"]["statut_participant"] | null
+        Relationships: [
+          {
+            foreignKeyName: "participants_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_candidatures_publiques: {
+        Row: {
+          classe_niveau: string
+          created_at: string | null
+          edition_id: string
+          etablissement: string
+          id: string
+          nom: string
+          prenom: string
+          statut: Database["public"]["Enums"]["statut_candidatura"]
         }
-        Update: {
-          classe_niveau?: string | null
-          etablissement?: string | null
-          id?: string | null
-          nom?: string | null
-          numero?: number | null
-          photo_path?: string | null
-          prenom?: string | null
-          statut?: Database["public"]["Enums"]["statut_participant"] | null
+        Relationships: []
+      }
+      v_palmares_publics: {
+        Row: {
+          edition_annee: number
+          edition_id: string
+          edition_nom: string
+          participant_classe: string
+          participant_etablissement: string
+          participant_id: string
+          participant_nom: string
+          participant_numero: number
+          participant_prenom: string
+          rang: number
+          titre: string | null
         }
         Relationships: []
       }

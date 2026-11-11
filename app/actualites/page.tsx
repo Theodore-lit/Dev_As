@@ -1,29 +1,100 @@
-export const metadata = { title: 'Actualités – Question pour un DevAs' };
+import { Suspense } from 'react';
+import { io } from 'next/cache';
+import { createClient } from '@/src/utils/supabase/server';
+import { ActualitesList, type ActualiteCardData } from '@/src/components/actualites/actualites-list';
+import { ErrorState } from '@/src/components/ui/error-state';
+
+export const metadata = {
+  title: 'Actualités – Question pour un DevAs',
+  description: 'Suivez les nouvelles et les temps forts de la compétition.',
+};
 
 export default function ActualitesPage() {
   return (
-    <div className="bg-soft min-h-screen">
-      <div className="max-w-[1180px] mx-auto px-4 py-16">
-        <span className="text-xs font-semibold uppercase tracking-widest text-green">Actualités</span>
-        <h1 className="mt-2 mb-10">Dernières nouvelles</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { tag: "Candidatures", date: "2 octobre 2026", title: "Question pour un DevAs 2027 est ouverte", body: "Les candidatures pour la prochaine édition sont officiellement ouvertes. Déposez votre dossier avant la clôture." },
-            { tag: "Résultats",    date: "15 oct. 2026",   title: "Session 3 : les résultats officiels publiés", body: "Retrouvez les scores et décisions du jury pour la troisième séance de qualification." },
-            { tag: "Jury",          date: "20 oct. 2026",  title: "Un nouveau membre rejoint le jury", body: "L’organisation accueille un nouvel expert au sein du jury pour l’édition en cours." },
-          ].map(({ tag, date, title, body }) => (
-            <article key={title} className="bg-white rounded-2xl border border-line overflow-hidden">
-              <div className="bg-green-pale h-36 flex items-center justify-center text-5xl">📰</div>
-              <div className="p-5">
-                <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-green-pale text-green-dark text-xs font-semibold mb-2">{tag}</span>
-                <p className="text-xs text-mute mb-1">{date}</p>
-                <h3 className="font-bold mb-2">{title}</h3>
-                <p className="text-sm text-mute">{body}</p>
-              </div>
-            </article>
-          ))}
+    <>
+      <header className="border-b border-line bg-soft py-12 md:py-16">
+        <div className="wrap">
+          <span className="eyebrow">Actualités</span>
+          <h1 className="mt-2">Le journal de la compétition</h1>
         </div>
-      </div>
+      </header>
+
+      <section className="wrap flex-1 py-8 md:py-10">
+        <Suspense fallback={<ActualitesSkeleton />}>
+          <ActualitesDynamic />
+        </Suspense>
+      </section>
+    </>
+  );
+}
+
+function ActualitesSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3].map((item) => (
+        <div key={item} className="overflow-hidden rounded-xl border border-line">
+          <div className="h-36 animate-pulse bg-line/40" />
+          <div className="space-y-3 p-4">
+            <div className="h-3 w-1/3 animate-pulse rounded bg-line/50" />
+            <div className="h-5 w-4/5 animate-pulse rounded bg-line/50" />
+            <div className="h-10 animate-pulse rounded bg-line/50" />
+          </div>
+        </div>
+      ))}
     </div>
   );
+}
+
+async function ActualitesDynamic() {
+  await io();
+
+  let articles: ActualiteCardData[] | undefined;
+  try {
+    articles = await loadActualites();
+  } catch (error) {
+    console.error('Échec du chargement des actualités :', error);
+  }
+
+  if (articles === undefined) {
+    return (
+      <ErrorState
+        title="Actualités indisponibles"
+        message="Impossible de charger les articles pour le moment."
+      />
+    );
+  }
+
+  return <ActualitesList articles={articles} />;
+}
+
+async function loadActualites(): Promise<ActualiteCardData[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('actualites')
+    .select('id, titre, resume, contenu, categorie, image_path, publie_le, created_at')
+    .eq('statut', 'publiee')
+    .order('publie_le', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((article) => ({
+    id: article.id,
+    titre: article.titre,
+    resume: article.resume,
+    contenu: article.contenu,
+    categorie: article.categorie,
+    imageUrl: getImageUrl(supabase, article.image_path),
+    publieLe: article.publie_le,
+    createdAt: article.created_at,
+  }));
+}
+
+function getImageUrl(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  imagePath: string | null,
+): string | null {
+  if (!imagePath) return null;
+  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+
+  return supabase.storage.from('actualites-images').getPublicUrl(imagePath).data.publicUrl;
 }

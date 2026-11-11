@@ -95,7 +95,7 @@ export default async function PalmaresDetailPage({
     }
 
     return (
-      <div className="min-h-screen bg-white">
+      <div className="bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Header */}
           <div className="text-center mb-12">
@@ -162,7 +162,7 @@ export default async function PalmaresDetailPage({
   } catch (error) {
     console.error('Error fetching palmares:', error);
     return (
-      <div className="min-h-screen bg-white">
+      <div className="bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <ErrorState
             title="Erreur lors du chargement"

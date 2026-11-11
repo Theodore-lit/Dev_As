@@ -15,6 +15,14 @@ interface CandidatureResult {
   errors?: Record<string, string>;
 }
 
+function getOptionalFormValue(
+  formData: FormData,
+  name: string,
+): FormDataEntryValue | undefined {
+  const value = formData.get(name);
+  return value === null || value === '' ? undefined : value;
+}
+
 export async function submitCandidature(
   formData: FormData,
 ): Promise<CandidatureResult> {
@@ -26,13 +34,13 @@ export async function submitCandidature(
       edition_id: formData.get('edition_id'),
       nom: formData.get('nom'),
       prenom: formData.get('prenom'),
-      date_naissance: formData.get('date_naissance'),
-      sexe: formData.get('sexe'),
+      date_naissance: getOptionalFormValue(formData, 'date_naissance'),
+      sexe: getOptionalFormValue(formData, 'sexe'),
       etablissement: formData.get('etablissement'),
       classe_niveau: formData.get('classe_niveau'),
       email: formData.get('email'),
-      telephone: formData.get('telephone'),
-      informations: formData.get('informations'),
+      telephone: getOptionalFormValue(formData, 'telephone'),
+      informations: getOptionalFormValue(formData, 'informations'),
     };
 
     // Validate

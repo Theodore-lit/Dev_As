@@ -44,6 +44,11 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
     role === 'participant' ? participantLinks :
     publicLinks;
 
+  const isActive = (href: string) =>
+    href === '/resultats'
+      ? pathname === href || pathname === '/matchs' || pathname.startsWith('/matchs/')
+      : pathname === href || pathname.startsWith(`${href}/`);
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-line">
       <div className="max-w-[1180px] mx-auto px-4 flex items-center gap-6 h-[68px] relative">
@@ -70,7 +75,7 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
           aria-label="Navigation principale"
         >
           {links.map(link => {
-            const active = pathname === link.href;
+            const active = isActive(link.href);
             return (
               <Link
                 key={link.href}
@@ -153,7 +158,7 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
               onClick={() => setOpen(false)}
               className={[
                 'px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                pathname === link.href
+                isActive(link.href)
                   ? 'text-green-dark bg-green-pale font-semibold'
                   : 'text-ink hover:bg-soft',
               ].join(' ')}

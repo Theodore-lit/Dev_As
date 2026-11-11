@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { MatchCard } from './match-card';
+import { SwordsIcon } from '@/src/components/common/icons';
+import { EmptyState } from '@/src/components/ui/empty-state';
 
 type Match = {
   id: string;
@@ -31,10 +33,11 @@ export function MatchList({ matchs }: MatchListProps) {
 
   if (matchs.length === 0) {
     return (
-      <div className="text-center py-20 text-mute">
-        <p className="text-4xl mb-4">🏟️</p>
-        <p className="font-semibold">Aucun match disponible pour le moment.</p>
-      </div>
+      <EmptyState
+        icon={<SwordsIcon className="h-7 w-7" />}
+        title="Aucun match pour le moment"
+        description="Les matchs de la compétition apparaîtront ici dès leur publication."
+      />
     );
   }
 
@@ -61,9 +64,11 @@ export function MatchList({ matchs }: MatchListProps) {
 
       {/* Grille */}
       {filtered.length === 0 ? (
-        <p className="text-mute text-sm py-10 text-center">
-          Aucun match dans cette catégorie.
-        </p>
+        <EmptyState
+          icon={<SwordsIcon className="h-7 w-7" />}
+          title="Aucun match dans cette catégorie"
+          description="Sélectionnez un autre filtre pour consulter les matchs disponibles."
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((m) => (
