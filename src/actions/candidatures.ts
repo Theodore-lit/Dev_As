@@ -87,46 +87,89 @@ export async function submitCandidature(
       };
     }
 
-    // Generate follow-up code
-    const codesuivi = generateFollowUpCode();
+    // Appel de la fonction stockée deposer_candidatura (SECURITY DEFINER)
+    const { data: rpcResult, error: rpcError } = await supabase.rpc(
+      'deposer_candidatura',
+      {
+        p_edition_id: validationResult.data.edition_id,
+        p_nom: validationResult.data.nom,
+        p_prenom: validationResult.data.prenom,
+        p_email: validationResult.data.email,
+        p_etablissement: validationResult.data.etablissement,
+        p_classe_niveau: validationResult.data.classe_niveau,
+        p_date_naissance: validationResult.data.date_naissance
+          ? validationResult.data.date_naissance.toISOString().split('T')[0]
+          : undefined,
+        p_sexe: validationResult.data.sexe || undefined,
+        p_telephone: validationResult.data.telephone || undefined,
+        p_informations: validationResult.data.informations || undefined,
+      },
+    );
 
-    // Insert candidature
-    const { data: candidature, error: insertError } = await supabase
-      .from('candidatures')
-      .insert([
-        {
-          edition_id: validationResult.data.edition_id,
-          nom: validationResult.data.nom,
-          prenom: validationResult.data.prenom,
-          date_naissance: validationResult.data.date_naissance
-            ? validationResult.data.date_naissance.toISOString().split('T')[0]
-            : null,
-          sexe: validationResult.data.sexe || null,
-          etablissement: validationResult.data.etablissement,
-          classe_niveau: validationResult.data.classe_niveau,
-          email: validationResult.data.email,
-          telephone: validationResult.data.telephone || null,
-          informations: validationResult.data.informations || null,
-          code_suivi: codesuivi,
-          statut: 'en_attente',
+    if (rpcError) {
+      console.error('RPC deposer_candidatura error:', rpcError);
+
+      // Fallback: tentative d'insertion directe si la fonction RPC n'est pas trouvée
+      const codesuivi = generateFollowUpCode();
+      const { data: candidature, error: insertError } = await supabase
+        .from('candidatures')
+        .insert([
+          {
+            edition_id: validationResult.data.edition_id,
+            nom: validationResult.data.nom,
+            prenom: validationResult.data.prenom,
+            date_naissance: validationResult.data.date_naissance
+              ? validationResult.data.date_naissance.toISOString().split('T')[0]
+              : null,
+            sexe: validationResult.data.sexe || null,
+            etablissement: validationResult.data.etablissement,
+            classe_niveau: validationResult.data.classe_niveau,
+            email: validationResult.data.email,
+            telephone: validationResult.data.telephone || null,
+            informations: validationResult.data.informations || null,
+            code_suivi: codesuivi,
+            statut: 'en_attente',
+          },
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        return {
+          ok: false,
+          error: rpcError.message || 'Erreur lors de la création de la candidature',
+        };
+      }
+
+      return {
+        ok: true,
+        data: {
+          id: candidature.id,
+          code_suivi: candidature.code_suivi,
         },
-      ])
-      .select()
-      .single();
+      };
+    }
 
-    if (insertError) {
-      console.error('Insert error:', insertError);
+    const res = rpcResult as {
+      success: boolean;
+      message?: string;
+      code_suivi?: string;
+      candidature_id?: string;
+    };
+
+    if (!res.success) {
       return {
         ok: false,
-        error: 'Erreur lors de la création de la candidature',
+        error: res.message || 'Erreur lors du dépôt de la candidature',
       };
     }
 
     return {
       ok: true,
       data: {
-        id: candidature.id,
-        code_suivi: candidature.code_suivi,
+        id: res.candidature_id!,
+        code_suivi: res.code_suivi!,
       },
     };
   } catch (error) {

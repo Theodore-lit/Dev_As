@@ -1,58 +1,51 @@
-import { createClient } from '@/src/utils/supabase/server';
-import { EditionList } from '@/src/components/editions/edition-list';
-import { ErrorState } from '@/src/components/ui/error-state';
-
-
-export const instant = false;
+import { unstable_noStore } from "next/cache";
+import { createClient } from "@/src/utils/supabase/server";
+import { EditionList } from "@/src/components/editions/edition-list";
+import { ErrorState } from "@/src/components/ui/error-state";
 
 export const metadata = {
-  title: 'Éditions - Question pour un DevAs',
-  description: 'Découvrez toutes les éditions de Question pour un DevAs',
+  title: "Editions - Question pour un DevAs",
+  description: "Decouvrez toutes les editions de Question pour un DevAs.",
 };
 
 export default async function EditionsPage() {
+  unstable_noStore();
   try {
     const supabase = await createClient();
 
     const { data: editions, error } = await supabase
-      .from('editions')
-      .select('*')
-      .order('annee', { ascending: false });
+      .from("editions")
+      .select("*")
+      .order("annee", { ascending: false });
 
     if (error) throw error;
 
     return (
-      <section className="s">
-        <div className="wrap">
-          {/* Header */}
-          <div className="sh">
-            <div>
-              <h1>Éditions de Question pour un DevAs</h1>
-              <p className="mute">
-                Retrouvez toutes les éditions précédentes et consultez les résultats, les participants et les classements.
-              </p>
-            </div>
+      <>
+        <div className="bg-soft border-b border-line py-14">
+          <div className="wrap">
+            <span className="eyebrow">Historique</span>
+            <h1 className="mt-2 mb-3">Toutes les editions</h1>
+            <p className="mute max-w-[56ch]">
+              Retrouvez toutes les editions de Question pour un DevAs, leurs resultats, participants et classements.
+            </p>
           </div>
-
-          {/* Content */}
-          {editions && editions.length > 0 ? (
-            <EditionList editions={editions} />
-          ) : (
-            <ErrorState
-              title="Aucune édition disponible"
-              message="Il n'y a pas d'éditions disponibles pour le moment. Veuillez revenir plus tard."
-            />
-          )}
         </div>
-      </section>
+        <div className="py-12">
+          <div className="wrap">
+            <EditionList editions={editions ?? []} />
+          </div>
+        </div>
+      </>
     );
   } catch (error) {
-    console.error('Error fetching editions:', error);
+    console.error(error);
     return (
-      <ErrorState
-        title="Erreur lors du chargement"
-        message="Une erreur s'est produite lors du chargement des éditions. Veuillez réessayer."
-      />
+      <div className="py-20">
+        <div className="wrap">
+          <ErrorState title="Erreur" message="Impossible de charger les editions." />
+        </div>
+      </div>
     );
   }
 }

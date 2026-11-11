@@ -12,7 +12,7 @@ export function Footer() {
           {/* About */}
           <div>
             <h3 className="font-semibold text-neutral-dark mb-4">
-              Question pour un DevAs
+              Question pour un DevChampion
             </h3>
             <p className="text-sm text-gray-600">
               Une compétition intellectuelle de culture générale pour les

@@ -5,7 +5,7 @@ import { createServerClient } from '@supabase/ssr';
 const PUBLIC_ROUTES = [
   '/',
   '/connexion',
-  '/candidater',
+  '/candidacy',
   '/editions',
   '/participants',
   '/resultats',
@@ -28,8 +28,12 @@ const PARTICIPANT_ROUTES = ['/participant'];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
+
   // 1. Create a Supabase client with request context
-  let supabase = createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -37,27 +41,33 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookies) {
-          cookies.forEach(({ name, value, options }) => {
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
+          });
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) => {
+            supabaseResponse.cookies.set(name, value, options);
           });
         },
       },
     },
   );
 
-  // 2. Refresh session and get current user
+  // 2. Refresh session and get current user securely
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // 3. Get user's profile/role if authenticated
   let role: string | null = null;
-  if (session?.user) {
+  if (user) {
     const { data: profile } = await supabase
       .from('profils')
       .select('role')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     role = profile?.role || null;
@@ -76,27 +86,31 @@ export async function middleware(request: NextRequest) {
 
   // Allow public routes for everyone
   if (isPublicRoute) {
-    return NextResponse.next();
+    return supabaseResponse;
   }
 
   // Admin routes: require super_admin or admin role
   if (isAdminRoute) {
-    if (!session || (role !== 'super_admin' && role !== 'admin')) {
-      return NextResponse.redirect(new URL('/connexion', request.url));
+    if (!user || (role !== 'super_admin' && role !== 'admin')) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/connexion';
+      return NextResponse.redirect(url);
     }
-    return NextResponse.next();
+    return supabaseResponse;
   }
 
   // Participant routes: require participant role
   if (isParticipantRoute) {
-    if (!session || role !== 'participant') {
-      return NextResponse.redirect(new URL('/connexion', request.url));
+    if (!user || role !== 'participant') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/connexion';
+      return NextResponse.redirect(url);
     }
-    return NextResponse.next();
+    return supabaseResponse;
   }
 
   // Default: allow
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {

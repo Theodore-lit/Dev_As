@@ -58,7 +58,7 @@ export const MAX_FILE_SIZE = 300 * 1024; // 300 KB
 export const PUBLIC_ROUTES = [
   '/',
   '/connexion',
-  '/candidater',
+  '/candidacy',
   '/editions',
   '/participants',
   '/resultats',

@@ -1,63 +1,49 @@
-import { createClient } from '@/src/utils/supabase/server';
-import { MatchList } from '@/src/components/matchs/match-list';
-import { ErrorState } from '@/src/components/ui/error-state';
-
-
-export const instant = false;
+import { unstable_noStore } from "next/cache";
+import { createClient } from "@/src/utils/supabase/server";
+import { MatchList } from "@/src/components/matchs/match-list";
+import { ErrorState } from "@/src/components/ui/error-state";
 
 export const metadata = {
-  title: 'Matchs - Question pour un DevAs',
-  description: 'Consultez tous les matchs et résultats de Question pour un DevAs',
+  title: "Matchs - Question pour un DevAs",
+  description: "Consultez les matchs et resultats de Question pour un DevAs.",
 };
 
 export default async function MatchsPage() {
+  unstable_noStore();
   try {
     const supabase = await createClient();
 
-    // Get all seances (matchs)
-    const { data: seances, error } = await supabase
-      .from('seances')
-      .select('*')
-      .order('date', { ascending: false });
+    const { data: matchs, error } = await supabase
+      .from("matchs")
+      .select("*, phase:phases(nom, type)")
+      .order("date_heure", { ascending: false });
 
     if (error) throw error;
 
     return (
-      <section className="s alt">
-        <div className="wrap stack">
-          {/* Header */}
-          <div className="sh">
-            <div>
-              <h1>Matchs et Résultats</h1>
-              <p className="mute">
-                Consultez tous les matchs, les scores et les résultats de chaque phase.
-              </p>
-            </div>
+      <div className="bg-soft min-h-screen">
+        <div className="bg-white border-b border-line py-12">
+          <div className="max-w-[1180px] mx-auto px-4">
+            <span className="eyebrow">Competition</span>
+            <h1 className="mt-2 mb-2">Matchs et Resultats</h1>
+            <p className="mute">
+              Consultez tous les matchs, les scores et les resultats de chaque phase.
+            </p>
           </div>
-
-          {/* Content */}
-          {seances && seances.length > 0 ? (
-            <MatchList seances={seances} />
-          ) : (
-            <ErrorState
-              title="Aucun match disponible"
-              message="Il n'y a pas de matchs disponibles pour le moment."
-            />
-          )}
         </div>
-      </section>
+        <div className="max-w-[1180px] mx-auto px-4 py-10">
+          <MatchList matchs={matchs ?? []} />
+        </div>
+      </div>
     );
   } catch (error) {
-    console.error('Error fetching matchs:', error);
+    console.error(error);
     return (
-      <section className="s">
-        <div className="wrap">
-          <ErrorState
-            title="Erreur lors du chargement"
-            message="Une erreur s'est produite lors du chargement des matchs."
-          />
+      <div className="py-20">
+        <div className="max-w-[1180px] mx-auto px-4">
+          <ErrorState title="Erreur" message="Impossible de charger les matchs." />
         </div>
-      </section>
+      </div>
     );
   }
 }

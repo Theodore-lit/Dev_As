@@ -21,6 +21,10 @@ const medalEmojis: Record<number, string> = {
 };
 
 export function Podium({ podium }: PodiumProps) {
+  // Guard: podium may be undefined/null
+  if (!podium || podium.length === 0) {
+    return <p className="text-center text-mute py-10">Aucun champion enregistré pour cette édition.</p>;
+  }
   // Sort by rang (1, 2, 3) and arrange 2, 1, 3 for visual layout
   const sorted = [...podium].sort((a, b) => a.rang - b.rang);
   const arranged = [sorted[1], sorted[0], sorted[2]].filter(Boolean);

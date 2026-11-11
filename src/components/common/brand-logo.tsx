@@ -22,12 +22,12 @@ export function BrandLogo({ size = 'md', href = '/' }: BrandLogoProps) {
       width={dimensions.width}
       height={dimensions.height}
       priority
-      className="object-contain"
+      className="object-contain h-full w-auto"
     />
   );
 
   if (href) {
-    return <a href={href}>{logo}</a>;
+    return logo;
   }
 
   return <div>{logo}</div>;

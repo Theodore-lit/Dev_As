@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { BrandLogo } from './brand-logo';
-import { Button } from '../ui/button';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 interface HeaderProps {
   role?: 'public' | 'participant' | 'admin';
@@ -11,115 +11,164 @@ interface HeaderProps {
   onLogout?: () => void;
 }
 
+const publicLinks = [
+  { label: 'Accueil',        href: '/' },
+  { label: 'La compétition', href: '/competition' },
+  { label: 'Éditions',       href: '/editions' },
+  { label: 'Participants',   href: '/participants' },
+  { label: 'Résultats',      href: '/resultats' },
+  { label: 'Palmarès',       href: '/palmares' },
+  { label: 'Actualités',     href: '/actualites' },
+];
+
+const adminLinks = [
+  { label: 'Dashboard',    href: '/admin' },
+  { label: 'Éditions',     href: '/editions' },
+  { label: 'Candidatures', href: '/candidacy' },
+  { label: 'Participants', href: '/participants' },
+  { label: 'Résultats',    href: '/matchs' },
+];
+
+const participantLinks = [
+  { label: 'Mon espace', href: '/participant' },
+  { label: 'Mes matchs', href: '/matchs' },
+  { label: 'Palmarès',   href: '/palmares' },
+];
+
 export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
-  const navLinks = {
-    public: [
-      { label: 'Accueil', href: '/' },
-      { label: 'Éditions', href: '/editions' },
-      { label: 'Participants', href: '/participants' },
-      { label: 'Résultats', href: '/resultats' },
-      { label: 'Palmares', href: '/palmares' },
-    ],
-    participant: [
-      { label: 'Tableau de bord', href: '/participant/dashboard' },
-      { label: 'Profil', href: '/participant/profil' },
-      { label: 'Parcours', href: '/participant/parcours' },
-      { label: 'Statistiques', href: '/participant/statistiques' },
-    ],
-    admin: [
-      { label: 'Tableau de bord', href: '/admin/dashboard' },
-      { label: 'Éditions', href: '/admin/editions' },
-      { label: 'Candidatures', href: '/admin/candidatures' },
-      { label: 'Participants', href: '/admin/participants' },
-      { label: 'Résultats', href: '/admin/resultats' },
-    ],
-  };
-
-  const links = navLinks[role];
+  const links =
+    role === 'admin'       ? adminLinks :
+    role === 'participant' ? participantLinks :
+    publicLinks;
 
   return (
-    <header className="border-b border-gray-200 bg-white">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <BrandLogo size="md" href="/" />
+    <header className="sticky top-0 z-50 bg-white border-b border-line">
+      <div className="max-w-[1180px] mx-auto px-4 flex items-center gap-6 h-[68px] relative">
 
-          {/* Navigation - Desktop */}
-          <nav className="hidden md:flex items-center gap-6">
-            {links.map((link) => (
+        {/* Logo */}
+        <Link href="/" aria-label="Accueil DevAs" className="flex items-center shrink-0">
+          <Image
+            src="/logo.png"
+            alt="DevAs – Question pour un Champion"
+            width={120}
+            height={52}
+            priority
+            className="h-[52px] w-auto object-contain"
+          />
+        </Link>
+
+        {/* Nav desktop */}
+        <nav
+          className={[
+            'items-center gap-0.5',
+            'hidden md:flex',
+            open ? '!flex absolute left-0 right-0 top-full flex-col bg-white border-b border-line px-4 py-3 shadow-sm z-40' : '',
+          ].join(' ')}
+          aria-label="Navigation principale"
+        >
+          {links.map(link => {
+            const active = pathname === link.href;
+            return (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-gray-700 hover:text-brand-primary transition-colors"
+                onClick={() => setOpen(false)}
+                className={[
+                  'relative px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  active
+                    ? 'text-green-dark font-semibold bg-green-pale'
+                    : 'text-ink hover:bg-soft',
+                ].join(' ')}
               >
                 {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Auth Section */}
-          <div className="flex items-center gap-4">
-            {userName ? (
-              <>
-                <span className="text-sm text-gray-600">{userName}</span>
-                {onLogout && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onLogout}
-                  >
-                    Déconnexion
-                  </Button>
+                {active && (
+                  <span className="hidden md:block absolute bottom-[-14px] left-3 right-3 h-[3px] bg-green rounded-full" />
                 )}
-              </>
-            ) : (
-              role === 'public' && (
-                <Button asChild size="sm">
-                  <Link href="/connexion">Connexion</Link>
-                </Button>
-              )
-            )}
-          </div>
+              </Link>
+            );
+          })}
+        </nav>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Menu"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+        <div className="flex-1" />
+
+        {/* Auth */}
+        <div className="hidden md:flex items-center gap-2 shrink-0">
+          {userName ? (
+            <>
+              <span className="text-sm text-mute">{userName}</span>
+              {onLogout && (
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium text-ink hover:bg-soft transition-colors"
+                >
+                  Déconnexion
+                </button>
+              )}
+            </>
+          ) : role === 'public' ? (
+            <>
+              <Link
+                href="/connexion"
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-ink hover:bg-soft transition-colors"
+              >
+                Connexion
+              </Link>
+              <Link
+                href="/candidacy"
+                className="px-4 py-2 rounded-[10px] bg-orange !text-white text-sm font-bold hover:bg-orange-dark hover:!text-white transition-colors"
+              >
+                Candidater
+              </Link>
+            </>
+          ) : null}
         </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <nav className="md:hidden mt-4 space-y-2">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block px-2 py-2 text-sm text-gray-700 hover:bg-brand-light-green rounded transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        )}
+        {/* Burger mobile */}
+        <button
+          type="button"
+          className="md:hidden p-2 rounded-lg text-ink hover:bg-soft transition-colors"
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+        >
+          {open
+            ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          }
+        </button>
+
       </div>
+
+      {/* Mobile nav dropdown */}
+      {open && (
+        <div className="md:hidden border-t border-line bg-white px-4 py-3 flex flex-col gap-1 shadow-sm">
+          {links.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setOpen(false)}
+              className={[
+                'px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                pathname === link.href
+                  ? 'text-green-dark bg-green-pale font-semibold'
+                  : 'text-ink hover:bg-soft',
+              ].join(' ')}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {role === 'public' && (
+            <div className="flex gap-2 mt-3 pt-3 border-t border-line">
+              <Link href="/connexion" className="flex-1 py-2 text-center rounded-lg text-sm font-semibold text-ink bg-soft hover:bg-line transition-colors">Connexion</Link>
+              <Link href="/candidacy" className="flex-1 py-2 text-center rounded-[10px] text-sm font-bold !text-white bg-orange hover:bg-orange-dark hover:!text-white transition-colors">Candidater</Link>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 }

@@ -1,20 +1,18 @@
 import { createClient } from '@/src/utils/supabase/server';
 import { Podium } from '@/src/components/palmares/podium';
+import { RankingTable } from '@/src/components/palmares/ranking-table';
 import { ErrorState } from '@/src/components/ui/error-state';
 
-
-export const instant = false;
-
 export const metadata = {
-  title: 'Palmares - Question pour un DevAs',
-  description: 'Découvrez les résultats et classements de Question pour un DevAs',
+  title: 'Palmares – Question pour un DevAs',
+  description: 'Découvrez les champions de Question pour un DevAs.',
 };
 
 export default async function PalmaresPage() {
   try {
     const supabase = await createClient();
 
-    // Get latest edition
+    // Dernière édition terminée
     const { data: edition, error: editionError } = await supabase
       .from('editions')
       .select('*')
@@ -25,44 +23,76 @@ export default async function PalmaresPage() {
 
     if (editionError || !edition) {
       return (
-        <section className="s">
-          <div className="wrap">
+        <div className="py-20">
+          <div className="max-w-[1180px] mx-auto px-4">
             <ErrorState
               title="Aucun palmares disponible"
-              message="Il n'y a pas de palmares disponible pour le moment."
+              message="Il n’y a pas encore de palmares disponible."
             />
           </div>
-        </section>
+        </div>
       );
     }
 
-    return (
-      <section className="s">
-        <div className="wrap stack">
-          {/* Header */}
-          <div className="sh">
-            <div>
-              <h1>Palmares</h1>
-              <p className="mute">Édition {edition.annee}</p>
-            </div>
-          </div>
+    // Récupérer le classement final de l’édition
+    const { data: classement } = await supabase
+      .from('classements_finaux')
+      .select('*, participant:participants(*)')
+      .eq('edition_id', edition.id)
+      .order('rang', { ascending: true })
+      .limit(10);
 
-          {/* Podium */}
-          <Podium editionId={edition.id} />
-        </div>
-      </section>
-    );
-  } catch (error) {
-    console.error('Error fetching palmares:', error);
+    const podiumData = (classement ?? []).slice(0, 3).map((entry: any) => ({
+      rang: entry.rang,
+      participant: entry.participant,
+      titre: entry.titre,
+    }));
+
+    const rankingData = (classement ?? []).map((entry: any) => ({
+      rang: entry.rang,
+      participant: entry.participant,
+      titre: entry.titre,
+    }));
+
     return (
-      <section className="s">
-        <div className="wrap">
-          <ErrorState
-            title="Erreur lors du chargement"
-            message="Une erreur s'est produite lors du chargement du palmares."
-          />
+      <>
+        {/* Hero */}
+        <div className="bg-soft border-b border-line py-14">
+          <div className="max-w-[1180px] mx-auto px-4">
+            <span className="text-xs font-semibold uppercase tracking-widest text-green">Palmares</span>
+            <h1 className="mt-2 mb-2">{"Édition "}{edition.annee}</h1>
+            <p className="text-mute text-base">{edition.nom}</p>
+          </div>
         </div>
-      </section>
+
+        <div className="py-12">
+          <div className="max-w-[1180px] mx-auto px-4 flex flex-col gap-12">
+            {podiumData.length > 0 ? (
+              <Podium podium={podiumData} />
+            ) : (
+              <p className="text-mute text-center py-10">
+                {"Le classement final n’est pas encore disponible."}
+              </p>
+            )}
+
+            {rankingData.length > 0 && (
+              <div>
+                <h2 className="text-lg font-bold mb-4">Classement complet</h2>
+                <RankingTable entries={rankingData} editionId={edition.id} />
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  } catch (err) {
+    console.error(err);
+    return (
+      <div className="py-20">
+        <div className="max-w-[1180px] mx-auto px-4">
+          <ErrorState title="Erreur" message="Impossible de charger le palmares." />
+        </div>
+      </div>
     );
   }
 }
