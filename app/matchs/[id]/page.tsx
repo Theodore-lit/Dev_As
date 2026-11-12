@@ -6,18 +6,19 @@ import { ErrorState } from '@/src/components/ui/error-state';
 export const instant = false;
 
 interface MatchDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: MatchDetailPageProps) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: match } = await supabase
       .from('matchs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (!match) {
@@ -40,6 +41,7 @@ export async function generateMetadata({ params }: MatchDetailPageProps) {
 export default async function MatchDetailPage({
   params,
 }: MatchDetailPageProps) {
+  const { id } = await params;
   try {
     const supabase = await createClient();
 
@@ -47,7 +49,7 @@ export default async function MatchDetailPage({
     const { data: match, error: matchError } = await supabase
       .from('matchs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (matchError || !match) {

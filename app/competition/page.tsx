@@ -27,11 +27,11 @@ export const metadata = {
 
 // Membres accrédités de la Régie financière pour le règlement des frais
 const REGIE_MEMBERS = [
-  { name: 'Tomy AZONSI', role: 'Régie financière', initials: 'TA' },
-  { name: 'Armel Kirchinot', role: 'Régie financière', initials: 'AK' },
-  { name: 'Steeven Tossa', role: 'Régie financière', initials: 'ST' },
-  { name: 'Alapini Primos', role: 'Régie financière', initials: 'AP' },
-  { name: 'OROPONDE Christelle', role: 'Régie financière', initials: 'OC' },
+  { name: 'Tomy AZONSI', role: 'Membre de Régie', initials: 'TA' },
+  { name: 'Armel Kirchinot', role: 'Membre de Régie', initials: 'AK' },
+  { name: 'Steven Tossa', role: 'Membre de Régie', initials: 'ST' },
+  { name: 'Alapini Primous', role: 'Membre de Régie', initials: 'AP' },
+  { name: 'Christelle ORONKPONDE', role: 'Membre de Régie et gestionnaire financière', initials: 'OC' },
 ];
 
 export default function CompetitionPage() {
@@ -344,10 +344,10 @@ async function CompetitionDynamic() {
                   </div>
                   <div>
                     <h4 className="font-heading font-extrabold text-base sm:text-lg text-ink">
-                      Règlement des frais auprès de la Régie
+                      Les membres de la Régie
                     </h4>
                     <p className="text-xs text-mute">
-                      Les frais de <strong>500 FCFA</strong> doivent être réglés directement et exclusivement auprès de l&apos;un des membres accrédités :
+                      Les frais de <strong>500 FCFA</strong> doivent être réglés directement et exclusivement auprès de <strong className="text-amber-500">ORONKPONDE Christelle</strong>
                     </p>
                   </div>
                 </div>

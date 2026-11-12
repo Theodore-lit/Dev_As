@@ -8,18 +8,19 @@ import { Card } from '@/src/components/ui/card';
 export const instant = false;
 
 interface PalmaresDetailPageProps {
-  params: {
+  params: Promise<{
     edition: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: PalmaresDetailPageProps) {
   try {
+    const { edition: editionId } = await params;
     const supabase = await createClient();
     const { data: edition } = await supabase
       .from('editions')
       .select('*')
-      .eq('id', params.edition)
+      .eq('id', editionId)
       .single();
 
     if (!edition) {
@@ -42,6 +43,7 @@ export async function generateMetadata({ params }: PalmaresDetailPageProps) {
 export default async function PalmaresDetailPage({
   params,
 }: PalmaresDetailPageProps) {
+  const { edition: editionId } = await params;
   try {
     const supabase = await createClient();
 
@@ -49,7 +51,7 @@ export default async function PalmaresDetailPage({
     const { data: edition, error: editionError } = await supabase
       .from('editions')
       .select('*')
-      .eq('id', params.edition)
+      .eq('id', editionId)
       .single();
 
     if (editionError || !edition) {
