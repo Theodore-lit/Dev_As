@@ -108,15 +108,17 @@ async function CompetitionDynamic() {
   if (activeEdition) {
     const [candRes, partRes] = await Promise.all([
       supabase
-        .from('candidatures')
-        .select('*', { count: 'exact', head: true })
-        .eq('edition_id', activeEdition.id),
+        .from('v_compteurs_candidatures_publics')
+        .select('total')
+        .eq('edition_id', activeEdition.id)
+        .maybeSingle(),
       supabase
         .from('participants')
         .select('*', { count: 'exact', head: true })
         .eq('edition_id', activeEdition.id),
     ]);
-    candidaturesCount = candRes.count || 0;
+    if (candRes.error) throw candRes.error;
+    candidaturesCount = candRes.data?.total ?? 0;
     participantsCount = partRes.count || 0;
   }
 

@@ -165,10 +165,7 @@ export function ActiveEditionSection({
                   <strong className="text-white font-semibold">15 000 FCFA</strong>
                 </div> */}
 
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="text-white/70">Score max par séance</span>
-                  <strong className="text-white font-semibold">{edition.score_max_defaut || 100} pts</strong>
-                </div>
+                
 
                 <div className="flex justify-between items-center py-1">
                   <span className="text-white/70">Participants confirmés</span>

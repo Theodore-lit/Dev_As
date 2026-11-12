@@ -97,12 +97,12 @@ export function EditionCard({ edition, calendar = [] }: EditionCardProps) {
             </div>
           )}
 
-          <div className="mt-3 flex items-center justify-between rounded-xl bg-soft/80 px-3 py-2.5">
+          {/* <div className="mt-3 flex items-center justify-between rounded-xl bg-soft/80 px-3 py-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-mute">
               Score maximum
             </p>
             <p className="text-sm font-bold text-ink">{edition.score_max_defaut} points</p>
-          </div>
+          </div> */}
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4">

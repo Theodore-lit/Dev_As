@@ -330,6 +330,7 @@ export type Database = {
           id: string
           intitule: string
           ordre: number
+          phase_id: string | null
           precision: string | null
           repere: string | null
           repere_date_fin: string | null
@@ -343,6 +344,7 @@ export type Database = {
           id?: string
           intitule: string
           ordre: number
+          phase_id?: string | null
           precision?: string | null
           repere?: string | null
           repere_date_fin?: string | null
@@ -356,6 +358,7 @@ export type Database = {
           id?: string
           intitule?: string
           ordre?: number
+          phase_id?: string | null
           precision?: string | null
           repere?: string | null
           repere_date_fin?: string | null
@@ -367,6 +370,13 @@ export type Database = {
             columns: ["edition_id"]
             isOneToOne: false
             referencedRelation: "editions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edition_calendrier_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "phases"
             referencedColumns: ["id"]
           },
         ]
@@ -956,6 +966,13 @@ export type Database = {
           nom: string
           prenom: string
           statut: Database["public"]["Enums"]["statut_candidatura"]
+        }
+        Relationships: []
+      }
+      v_compteurs_candidatures_publics: {
+        Row: {
+          edition_id: string
+          total: number
         }
         Relationships: []
       }

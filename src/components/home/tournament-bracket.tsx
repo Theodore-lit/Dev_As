@@ -8,6 +8,7 @@ import {
   CheckIcon,
   CoinsIcon,
   UtensilsIcon,
+  DownloadIcon,
 } from '@/src/components/common/icons';
 
 export function TournamentBracket() {
@@ -107,7 +108,17 @@ export function TournamentBracket() {
 
         {/* Boutons de navigation du scroll horizontal */}
         <div className="flex items-center gap-2 shrink-0">
-          <button
+          <a
+            href="/documents_officiels/CAHIER_DE_DEROULEMENT_DEVCHAMPION.pdf"
+            download="CAHIER_DE_DEROULEMENT_DEVCHAMPION.pdf"
+            aria-label="Télécharger le cahier de déroulement de la compétition"
+            title="Télécharger le cahier de déroulement"
+            className="inline-flex h-9 items-center gap-2 rounded-xl border border-green/20 bg-green-pale px-3 text-xs font-bold text-green-dark transition-colors hover:bg-green/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-dark"
+          >
+            <DownloadIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Déroulement PDF</span>
+          </a>
+          {/* <button
             type="button"
             onClick={() => scroll('left')}
             className="w-9 h-9 rounded-xl bg-soft hover:bg-line border border-line flex items-center justify-center text-slate-600 hover:text-ink transition-colors cursor-pointer"
@@ -126,7 +137,7 @@ export function TournamentBracket() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
-          </button>
+          </button> */}
         </div>
       </div>
 

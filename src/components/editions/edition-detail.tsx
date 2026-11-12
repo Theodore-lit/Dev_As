@@ -10,10 +10,10 @@ import {
 } from '@/src/components/common/icons';
 import {
   CalendarMilestones,
-  EditionCalendar,
   formatEditionDate,
   type EditionCalendarEntry,
 } from './edition-calendar';
+import { PhaseCalendarCard } from './phase-calendar-card';
 import { Badge } from '@/src/components/ui/badge';
 import { Card } from '@/src/components/ui/card';
 import type { Database } from '@/src/types/database';
@@ -41,14 +41,6 @@ const STATUS_MAP: Record<
   en_cours: { label: 'En cours', variant: 'wait' },
   terminee: { label: 'Terminée', variant: 'gold' },
   archivee: { label: 'Archivée', variant: 'no' },
-};
-
-const PHASE_LABELS: Record<Phase['type'], string> = {
-  qualification: 'Qualifications',
-  barrage: 'Barrage',
-  tour: 'Tour',
-  demi_finale: 'Demi-finales',
-  finale: 'Finale',
 };
 
 function StatCard({
@@ -136,7 +128,6 @@ export function EditionDetail({ edition, phases, calendar, stats }: EditionDetai
           <StatCard label="Candidatures" value={stats.candidatures} kind="applications" />
           <StatCard label="Participants" value={stats.participants} kind="participants" />
           <StatCard label="Matchs" value={stats.matchs} kind="matches" />
-          <StatCard label="Score maximum" value={`${edition.score_max_defaut} pts`} kind="score" />
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(260px,0.8fr)]">
@@ -212,10 +203,6 @@ export function EditionDetail({ edition, phases, calendar, stats }: EditionDetai
           </Card>
         </div>
 
-        <div className="mt-8">
-          <EditionCalendar entries={calendar} />
-        </div>
-
         <section className="mt-12" aria-labelledby="phases-title">
           <div className="relative isolate overflow-hidden rounded-[2rem] bg-green-dark px-5 py-8 shadow-card sm:px-8 sm:py-10 lg:px-10">
             <Image
@@ -248,53 +235,11 @@ export function EditionDetail({ edition, phases, calendar, stats }: EditionDetai
               <ol className="relative grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {phases.map((phase, index) => (
                   <li key={phase.id}>
-                    <Card className="relative flex h-full min-h-[280px] flex-col overflow-hidden rounded-3xl border-white/20 bg-white/10 p-5 text-white shadow-none backdrop-blur-md transition duration-200 hover:-translate-y-1 hover:bg-white/15 sm:p-6">
-                      <span
-                        className="pointer-events-none absolute -right-2 -top-8 select-none font-display text-[8rem] font-black leading-none text-white/[0.08]"
-                        aria-hidden="true"
-                      >
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-
-                      <div className="relative flex items-center justify-between gap-3">
-                        <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-white/70">
-                          <span className="h-2 w-2 rounded-full bg-orange" />
-                          Étape {String(index + 1).padStart(2, '0')}
-                        </span>
-                        <Badge
-                          variant="default"
-                          className="border border-white/20 bg-white/10 text-white"
-                        >
-                          {PHASE_LABELS[phase.type]}
-                        </Badge>
-                      </div>
-
-                      <div className="relative mt-8">
-                        <h3 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">
-                          {phase.nom}
-                        </h3>
-                        <p className="mt-2 text-sm text-white/70">
-                          Phase {phase.ordre} de la compétition
-                        </p>
-                      </div>
-
-                      <div className="relative mt-auto grid grid-cols-2 gap-2 pt-8 text-sm">
-                        <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
-                          <p className="text-xs text-white/65">Groupes</p>
-                          <p className="mt-1 text-lg font-bold text-white">{phase.nb_groupes}</p>
-                        </div>
-                        <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
-                          <p className="text-xs text-white/65">Qualifiés / groupe</p>
-                          <p className="mt-1 text-lg font-bold text-white">{phase.nb_qualifies_par_groupe}</p>
-                        </div>
-                        {phase.nb_barrage_par_groupe > 0 && (
-                          <div className="col-span-2 flex items-center justify-between gap-3 rounded-2xl border border-orange/30 bg-orange/15 px-3 py-2.5">
-                            <span className="text-xs font-medium text-white/80">Barrages par groupe</span>
-                            <span className="font-bold text-white">{phase.nb_barrage_par_groupe}</span>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
+                    <PhaseCalendarCard
+                      phase={phase}
+                      index={index}
+                      matches={calendar.filter((entry) => entry.phase_id === phase.id)}
+                    />
                   </li>
                 ))}
               </ol>

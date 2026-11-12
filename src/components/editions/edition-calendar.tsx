@@ -1,4 +1,4 @@
-import { CalendarIcon } from '@/src/components/common/icons';
+import { DownloadIcon } from '@/src/components/common/icons';
 import type { Database } from '@/src/types/database';
 
 export type EditionCalendarEntry =
@@ -18,7 +18,7 @@ export function formatEditionDate(
   });
 }
 
-function formatScheduleDate(value: string) {
+export function formatScheduleDate(value: string) {
   return formatEditionDate(value, {
     weekday: 'short',
     day: 'numeric',
@@ -113,9 +113,16 @@ export function EditionCalendar({
               Les rendez-vous
             </h2>
           </div>
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white text-green-dark shadow-sm">
-            <CalendarIcon className="h-5 w-5" />
-          </span>
+          <a
+            href="/documents_officiels/Planning_officiel_DevChampion_2026.pdf"
+            download="Planning_officiel_DevChampion_2026.pdf"
+            aria-label="Télécharger le calendrier officiel de la compétition"
+            title="Télécharger le calendrier officiel"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-2xl border border-orange/25 bg-white px-3 text-xs font-bold text-orange-dark shadow-sm transition-colors hover:bg-orange-pale/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+          >
+            <DownloadIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Calendrier PDF</span>
+          </a>
         </div>
         <p className="mt-2 text-sm text-mute">
           {entries.length} matchs programmés · horaires locaux

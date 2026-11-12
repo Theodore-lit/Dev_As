@@ -216,9 +216,9 @@ export function HeroSection({ totalEditions = 4 }: HeroSectionProps) {
                 <CalendarIcon className="w-5 h-5 text-orange-dark" />
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-sm text-ink leading-snug">Des éditions mémorables</p>
+                <p className="font-bold text-sm text-ink leading-snug">Notre toute première édition</p>
                 <p className="text-xs text-mute mt-0.5 leading-normal">
-                  {totalEditions > 0 ? `${totalEditions} éditions organisées à revivre.` : 'Revivez l’histoire de la compétition.'}
+                  Soyez les batisseurs de cette belle histoire qui débute. 
                 </p>
               </div>
             </div>

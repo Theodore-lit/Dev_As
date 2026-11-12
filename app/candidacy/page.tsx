@@ -104,8 +104,8 @@ async function CandidatureDynamic() {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-mute">
                   <span>{'Vous avez déjà candidaté ?'}</span>
-                  <Link href="/candidacy/suivi" className="text-green-dark font-semibold hover:underline">
-                    {'Suivre ma candidature →'}
+                  <Link href="/competition" className="text-green-dark font-semibold hover:underline">
+                    {'En savoir plus sur la compétition →'}
                   </Link>
                 </div>
               </div>
@@ -121,7 +121,10 @@ async function CandidatureDynamic() {
                   {edition.description && (
                     <p className="text-sm text-mute">{edition.description}</p>
                   )}
+
                 </div>
+
+                
 
                 <div className="bg-white rounded-xl border border-line p-5">
                   <h3 className="text-sm font-bold mb-4">{'Questions fréquentes'}</h3>
@@ -139,6 +142,14 @@ async function CandidatureDynamic() {
                     ))}
                   </div>
                 </div>
+                <a
+
+                 href="/competition"
+                  className="inline-flex items-center gap-2 h-11 px-6 rounded-[10px] bg-amber-500 text-white font-semibold text-sm hover:bg-amber-500 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  
+                >
+                  <span>En Savoir plus </span>
+                </a>
               </aside>
             </div>
           </div>

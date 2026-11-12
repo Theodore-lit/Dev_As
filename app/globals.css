@@ -884,3 +884,42 @@
     gap: 32px;
     flex-wrap: wrap;
   }
+
+.edition-phase-flip {
+  perspective: 1300px;
+  min-height: 310px;
+  outline: none;
+}
+
+.edition-phase-flip:focus-visible {
+  border-radius: 1.5rem;
+  outline: 3px solid var(--color-orange);
+  outline-offset: 4px;
+}
+
+.edition-phase-flip__inner {
+  display: grid;
+  min-height: 310px;
+  transform-style: preserve-3d;
+  transition: transform 760ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.edition-phase-flip__inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.edition-phase-flip__face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.edition-phase-flip__back {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edition-phase-flip__inner {
+    transition-duration: 0.01ms;
+  }
+}

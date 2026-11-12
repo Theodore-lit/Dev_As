@@ -57,7 +57,6 @@ Page détail d'une édition. Affiche:
   date_debut?: timestamp
   date_fin?: timestamp
   candidatures_ouvertes: boolean
-  score_max_defaut: number
 }
 
 // Phase

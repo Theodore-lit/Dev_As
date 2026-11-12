@@ -123,12 +123,12 @@ export function MatchDetail({
               </div>
             )}
 
-            {match.score_max && (
+            {/* {match.score_max && (
               <div>
                 <p className="font-medium text-gray-700 mb-1">Score maximum</p>
                 <p className="text-gray-900">{match.score_max}</p>
               </div>
-            )}
+            )} */}
           </div>
         </Card>
 

@@ -7,7 +7,6 @@ interface MatchCardProps {
     statut: string;
     date_heure: string | null;
     lieu: string | null;
-    score_max: number;
     phase?: { nom: string; type: string } | null;
   };
 }
@@ -50,7 +49,6 @@ export function MatchCard({ match }: MatchCardProps) {
         <div className="flex flex-wrap gap-3 text-xs text-mute">
           {dateStr && <span>📅 {dateStr}</span>}
           {match.lieu && <span>📍 {match.lieu}</span>}
-          <span>Score max : {match.score_max} pts</span>
         </div>
       </div>
     </Link>

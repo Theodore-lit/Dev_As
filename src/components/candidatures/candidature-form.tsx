@@ -54,9 +54,9 @@ export function CandidatureForm({ edition }: CandidatureFormProps) {
         <h2 className="text-xl font-bold mb-2">Candidature reçue !</h2>
         <p className="text-mute text-sm mb-6">Votre candidature a été enregistrée avec succès. Conservez votre code de suivi.</p>
         <div className="bg-soft border border-line rounded-xl p-5 mb-6 text-left">
-          <span className="block text-xs text-mute uppercase tracking-widest mb-2">Code de suivi</span>
-          <span className="block text-2xl font-extrabold font-heading text-green-dark tracking-widest mb-3">{successData.code}</span>
-          <span className="block text-xs text-mute">Un email a été envoyé à <strong>{successData.email}</strong></span>
+          {/* <span className="block text-xs text-mute uppercase tracking-widest mb-2">Code de suivi</span>
+          <span className="block text-2xl font-extrabold font-heading text-green-dark tracking-widest mb-3">{successData.code}</span> */}
+          <span className="block text-xs text-mute">Un email sera envoyé sur <strong>{successData.email}</strong> dès que votre candidature sera retenue.</span>
         </div>
         <button
           type="button"
@@ -154,26 +154,7 @@ export function CandidatureForm({ edition }: CandidatureFormProps) {
         </div>
       </fieldset>
 
-      {/* Motivation */}
-      {/* <fieldset className="mb-7 border-0 p-0">
-        <legend className={legendClass}>
-          Motivation <span className="text-xs font-normal text-mute">(optionnel)</span>
-        </legend>
-        <div>
-          <label htmlFor="cand-info" className={labelClass}>Message libre</label>
-          <textarea
-            id="cand-info"
-            name="informations"
-            placeholder="Parlez-nous de vous, de vos motivations, de votre parcours…"
-            maxLength={1000}
-            rows={4}
-            disabled={loading}
-            className="w-full px-3 py-2.5 border-[1.5px] border-[#cfd4da] rounded-[10px] bg-white text-sm text-ink focus:border-green focus:outline-none focus:ring-2 focus:ring-green/10 hover:border-[#aab1ba] transition-colors resize-y disabled:opacity-50"
-          />
-        </div>
-      </fieldset> */}
-
-      {/* Note info */}
+            {/* Note info */}
       <div className="flex gap-2.5 items-start bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-sm text-blue-900 mb-6">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5 text-blue-500" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <p>Votre candidature sera examinée par notre comité. Vous recevrez un code de suivi par email pour suivre l'avancement.</p>

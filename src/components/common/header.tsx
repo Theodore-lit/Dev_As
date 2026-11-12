@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -27,6 +27,28 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
 
   const links = publicLinks;
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
   const isActive = (href: string) =>
     href === '/resultats'
       ? pathname === href || pathname === '/matchs' || pathname.startsWith('/matchs/')
@@ -48,28 +70,21 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
           />
         </Link>
 
-        {/* Nav desktop */}
-        <nav
-          className={[
-            'flex-1 items-center justify-center gap-0.5',
-            'hidden md:flex',
-            open ? '!flex absolute left-0 right-0 top-full flex-col bg-white border-b border-line px-4 py-3 shadow-sm z-40' : '',
-          ].join(' ')}
-          aria-label="Navigation principale"
-        >
+        {/* Navigation desktop */}
+        <nav className="hidden flex-1 items-center justify-center gap-0.5 md:flex" aria-label="Navigation principale">
           {links.map(link => {
             const active = isActive(link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setOpen(false)}
                 className={[
                   'relative px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                   active
                     ? 'text-green-dark font-semibold bg-green-pale'
                     : 'text-ink hover:bg-soft',
                 ].join(' ')}
+                aria-current={active ? 'page' : undefined}
               >
                 {link.label}
                 {active && (
@@ -116,9 +131,10 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
         {/* Burger mobile */}
         <button
           type="button"
-          className="md:hidden p-2 rounded-lg text-ink hover:bg-soft transition-colors"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-ink transition-colors hover:bg-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-dark md:hidden"
           onClick={() => setOpen(!open)}
           aria-expanded={open}
+          aria-controls="mobile-navigation"
           aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
         >
           {open
@@ -129,31 +145,62 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
 
       </div>
 
-      {/* Mobile nav dropdown */}
+      {/* Mobile navigation */}
       {open && (
-        <div className="md:hidden border-t border-line bg-white px-4 py-3 flex flex-col gap-1 shadow-sm">
-          {links.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setOpen(false)}
-              className={[
-                'px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                isActive(link.href)
-                  ? 'text-green-dark bg-green-pale font-semibold'
-                  : 'text-ink hover:bg-soft',
-              ].join(' ')}
-            >
-              {link.label}
-            </Link>
-          ))}
-          {role === 'public' && (
-            <div className="flex gap-2 mt-3 pt-3 border-t border-line">
-              <Link href="/connexion" className="flex-1 py-2 text-center rounded-lg text-sm font-semibold text-ink bg-soft hover:bg-line transition-colors">Connexion</Link>
-              <Link href="/candidacy" className="flex-1 py-2 text-center rounded-[10px] text-sm font-bold !text-white bg-orange hover:bg-orange-dark hover:!text-white transition-colors">Candidater</Link>
-            </div>
-          )}
-        </div>
+        <>
+          <button
+            type="button"
+            className="fixed inset-x-0 bottom-0 top-[68px] z-30 bg-ink/35 md:hidden"
+            aria-label="Fermer le menu"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            id="mobile-navigation"
+            className="fixed inset-x-0 bottom-0 top-[68px] z-40 flex max-h-[calc(100dvh-68px)] flex-col overflow-y-auto border-t border-line bg-white shadow-xl md:hidden"
+          >
+            <nav aria-label="Navigation mobile" className="flex flex-col items-center gap-1 px-5 py-5">
+              {links.map(link => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={[
+                      'flex min-h-12 w-full max-w-sm items-center justify-center rounded-xl px-4 py-3 text-center text-base font-medium transition-colors',
+                      active
+                        ? 'bg-green-pale text-green-dark font-semibold'
+                        : 'text-ink hover:bg-soft active:bg-soft',
+                    ].join(' ')}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+            {role === 'public' && (
+              <div className="sticky bottom-0 mt-auto border-t border-line bg-white px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <div className="mx-auto grid w-full max-w-sm grid-cols-2 gap-2">
+                  <Link
+                    href="/connexion"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl bg-soft px-4 text-sm font-semibold text-ink transition-colors hover:bg-line"
+                  >
+                    Connexion
+                  </Link>
+                  <Link
+                    href="/candidacy"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl bg-orange px-4 text-sm font-bold !text-white transition-colors hover:bg-orange-dark hover:!text-white"
+                  >
+                    Candidater
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </header>
   );
