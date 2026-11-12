@@ -131,39 +131,45 @@ export function EditionCalendar({
 
       {entries.length > 0 ? (
         <ol
-          className={`divide-y divide-line/70 ${
-            isSidebar ? 'max-h-[min(68vh,720px)] overflow-y-auto' : 'grid sm:grid-cols-2'
+          className={`${
+            isSidebar
+              ? 'custom-scrollbar-y max-h-[min(72vh,780px)] space-y-3 overflow-y-auto p-3 sm:p-4 xl:max-h-[min(82vh,940px)]'
+              : 'grid gap-3 p-4 sm:grid-cols-2'
           }`}
         >
           {entries.map((entry) => (
             <li
               key={entry.id}
-              className={`flex gap-3 p-4 ${
-                !isSidebar ? 'border-b border-line/70 last:border-b-0' : ''
+              className={`calendar-match-card flex gap-3 p-3.5 sm:gap-4 sm:p-4 ${
+                entry.intitule === 'Grande finale' ? 'calendar-match-card--final' : ''
               }`}
             >
+              <span className="calendar-match-card__image" aria-hidden="true" />
+              <span className="calendar-match-card__veil" aria-hidden="true" />
               <span
-                className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-extrabold ${
+                className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xs font-extrabold shadow-sm ${
                   entry.intitule === 'Grande finale'
-                    ? 'bg-orange-pale text-orange-dark'
-                    : 'bg-green-pale text-green-dark'
+                    ? 'bg-orange text-white'
+                    : 'bg-green text-white'
                 }`}
               >
                 {String(entry.ordre).padStart(2, '0')}
               </span>
-              <div className="min-w-0 flex-1">
+              <div className="relative min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                   <h3 className="font-bold leading-5 text-ink">{entry.intitule}</h3>
                   <time
-                    className="text-xs font-bold capitalize text-green-dark"
+                    className="rounded-full border border-green/15 bg-white/80 px-2.5 py-1 text-xs font-bold capitalize text-green-dark"
                     dateTime={entry.date_match}
                   >
                     {formatScheduleDate(entry.date_match)}
                   </time>
                 </div>
-                <p className="mt-1 text-xs font-semibold text-orange-dark">{entry.horaire}</p>
+                <p className="mt-1.5 inline-flex rounded-md bg-orange-pale/90 px-2 py-1 text-xs font-bold text-orange-dark">
+                  {entry.horaire}
+                </p>
                 {entry.precision && (
-                  <p className="mt-1 text-xs leading-5 text-mute">{entry.precision}</p>
+                  <p className="mt-1.5 text-xs leading-5 text-ink/75">{entry.precision}</p>
                 )}
               </div>
             </li>

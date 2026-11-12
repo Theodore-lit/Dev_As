@@ -127,7 +127,8 @@ export function EditionDetail({ edition, phases, calendar, stats }: EditionDetai
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard label="Candidatures" value={stats.candidatures} kind="applications" />
           <StatCard label="Participants" value={stats.participants} kind="participants" />
-          <StatCard label="Matchs" value={stats.matchs} kind="matches" />
+          <StatCard label="Matchs" value={stats.matchs} kind="score" />
+          <StatCard label="Matchs à jouer" value={14 - stats.matchs} kind="matches"/>
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(260px,0.8fr)]">

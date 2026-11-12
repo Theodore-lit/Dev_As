@@ -308,10 +308,10 @@ async function CompetitionDynamic() {
       <section id="tableau" className="py-14 md:py-18 bg-white scroll-mt-12">
         <div className="max-w-[1180px] mx-auto px-4">
           <div className="grid items-start gap-6 xl:grid-cols-12">
-            <div className="min-w-0 overflow-hidden rounded-3xl border border-line bg-white p-4 shadow-xs sm:p-6 xl:col-span-7">
+            <div className="min-w-0 overflow-hidden rounded-3xl border border-line bg-white p-4 shadow-xs sm:p-6 xl:col-span-6">
               <TournamentBracket registrationOpen={Boolean(isCandidaturesOpen)} />
             </div>
-            <div className="xl:col-span-5">
+            <div className="min-w-0 xl:col-span-6">
               <EditionCalendar entries={calendar} variant="sidebar" />
             </div>
           </div>

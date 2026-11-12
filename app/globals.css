@@ -170,6 +170,34 @@
     background: #039846;
   }
 
+  .custom-scrollbar-y {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-green-light) #f3f4f6;
+    scrollbar-gutter: stable;
+    overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
+  }
+
+  .custom-scrollbar-y::-webkit-scrollbar {
+    width: 9px;
+  }
+
+  .custom-scrollbar-y::-webkit-scrollbar-track {
+    margin-block: 10px;
+    border-radius: 9999px;
+    background: #f1f5f9;
+  }
+
+  .custom-scrollbar-y::-webkit-scrollbar-thumb {
+    border: 2px solid #f1f5f9;
+    border-radius: 9999px;
+    background: #8bd3a8;
+  }
+
+  .custom-scrollbar-y::-webkit-scrollbar-thumb:hover {
+    background: #039846;
+  }
+
   .tw table {
     border-collapse: collapse;
     width: 100%;
@@ -920,6 +948,431 @@
 
 @media (prefers-reduced-motion: reduce) {
   .edition-phase-flip__inner {
+    transition-duration: 0.01ms;
+  }
+}
+
+.tournament-orbit {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 1;
+  margin-inline: auto;
+  --orbit-radius: clamp(112px, 39vw, 225px);
+}
+
+.tournament-orbit__ring {
+  position: absolute;
+  inset: 7%;
+  border: 1px dashed rgba(3, 152, 70, 0.3);
+  border-radius: 50%;
+}
+
+.tournament-orbit__ring::before,
+.tournament-orbit__ring::after {
+  position: absolute;
+  content: '';
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.tournament-orbit__ring::before {
+  inset: 6%;
+  border: 1px solid rgba(242, 104, 0, 0.1);
+}
+
+.tournament-orbit__ring::after {
+  inset: -1px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(3, 152, 70, 0.35) 22deg,
+    transparent 54deg,
+    transparent 360deg
+  );
+  mask: radial-gradient(farthest-side, transparent calc(100% - 1px), #000 calc(100% - 1px));
+  animation: tournament-orbit-spin 24s linear infinite;
+}
+
+@keyframes tournament-orbit-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.tournament-orbit__stop {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: clamp(68px, 18%, 106px);
+  min-height: 76px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--color-ink);
+  cursor: pointer;
+  translate: -50% -50%;
+  transform:
+    rotate(var(--orbit-angle))
+    translateY(calc(-1 * var(--orbit-radius)))
+    rotate(calc(-1 * var(--orbit-angle)));
+  transition: transform 650ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.tournament-orbit__stop:focus-visible {
+  border-radius: 1rem;
+  outline: 3px solid var(--color-green);
+  outline-offset: 3px;
+}
+
+.tournament-orbit__stop-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+  animation: tournament-orbit-float 3.8s ease-in-out infinite;
+  animation-delay: var(--float-delay);
+}
+
+.tournament-orbit__number {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 5px 16px rgba(31, 41, 55, 0.14);
+  color: var(--color-green-dark);
+  font: 800 0.8rem var(--font-display);
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    scale 180ms ease;
+}
+
+.tournament-orbit__label {
+  display: block;
+  max-width: 100%;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.2rem 0.45rem;
+  box-shadow: 0 2px 8px rgba(31, 41, 55, 0.08);
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.tournament-orbit__stop.is-current .tournament-orbit__number,
+.tournament-orbit__stop.is-selected .tournament-orbit__number {
+  background: var(--color-green);
+  color: white;
+  box-shadow: 0 0 0 5px rgba(3, 152, 70, 0.14), 0 8px 20px rgba(3, 152, 70, 0.22);
+  scale: 1.1;
+}
+
+.tournament-orbit__stop.is-final .tournament-orbit__number {
+  background: var(--color-orange);
+  color: white;
+}
+
+.tournament-orbit__card {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: min(58%, 360px);
+  border: 1px solid var(--color-line);
+  border-radius: 1.35rem;
+  background: linear-gradient(145deg, #fff, #f8fafc);
+  padding: 0.8rem;
+  box-shadow: 0 14px 36px rgba(31, 41, 55, 0.14);
+  transform: translate(-50%, -50%);
+  animation: tournament-orbit-card-float 4.5s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+  .tournament-orbit__card {
+    width: min(48%, 360px);
+  }
+}
+
+.tournament-orbit__card--current {
+  border-color: rgba(3, 152, 70, 0.3);
+  background: linear-gradient(145deg, #ddf4e5, #fff 62%);
+}
+
+.tournament-orbit__card--final {
+  border-color: rgba(242, 104, 0, 0.3);
+  background: linear-gradient(145deg, #fff0e2, #fff 62%);
+}
+
+@keyframes tournament-orbit-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -5px;
+  }
+}
+
+@keyframes tournament-orbit-card-float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 5px));
+  }
+}
+
+.calendar-match-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid rgba(226, 229, 233, 0.9);
+  border-radius: 1.15rem;
+  background: white;
+  box-shadow: 0 4px 12px rgba(31, 41, 55, 0.05);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.calendar-match-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(3, 152, 70, 0.25);
+  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.1);
+}
+
+.calendar-match-card__image {
+  position: absolute;
+  z-index: -2;
+  inset: -10px;
+  background-image: url('/hero1.png');
+  background-position: center;
+  background-size: cover;
+  filter: blur(7px) saturate(0.55);
+  opacity: 0.26;
+  transform: scale(1.05);
+}
+
+.calendar-match-card__veil {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.73));
+}
+
+.calendar-match-card--final {
+  border-color: rgba(242, 104, 0, 0.3);
+  background: #fffaf6;
+}
+
+.calendar-match-card--final .calendar-match-card__veil {
+  background: linear-gradient(110deg, rgba(255, 240, 226, 0.88), rgba(255, 255, 255, 0.72));
+}
+
+.profile-tile {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 310px;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: 1.5rem;
+  background: linear-gradient(145deg, #ddf4e5, #fff 60%, #fff0e2);
+  box-shadow: 0 10px 30px rgba(31, 41, 55, 0.08);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.profile-tile--participant {
+  border-color: rgba(3, 152, 70, 0.24);
+}
+
+.profile-tile summary {
+  position: relative;
+  display: block;
+  min-height: 310px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.profile-tile summary::-webkit-details-marker {
+  display: none;
+}
+
+.profile-tile summary:focus-visible {
+  outline: 3px solid var(--color-green);
+  outline-offset: -4px;
+}
+
+.profile-tile__art {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  transition:
+    filter 240ms ease,
+    transform 320ms ease;
+}
+
+.profile-tile__image {
+  object-fit: contain;
+  object-position: center 42%;
+  padding: 2.5rem 1.5rem 1.25rem;
+  transition: inherit;
+}
+
+.profile-tile__fallback {
+  display: grid;
+  width: 9rem;
+  height: 9rem;
+  place-items: center;
+  border: 6px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  background: var(--color-green-pale);
+  color: var(--color-green-dark);
+  font: 800 2.5rem var(--font-display);
+}
+
+.profile-tile__front {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 310px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent 35%, transparent 52%, rgba(17, 24, 39, 0.78));
+}
+
+.profile-tile__name {
+  color: #fff;
+  text-shadow: 0 1px 5px rgba(17, 24, 39, 0.35);
+}
+
+.profile-tile__name h3 {
+  margin-top: 0.2rem;
+  color: inherit;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.profile-tile__name p {
+  margin-top: 0.2rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
+}
+
+.profile-tile__kind {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 0.25rem 0.65rem;
+  color: var(--color-green-dark);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-tile__hint {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.65rem;
+}
+
+.profile-tile__reveal {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.76);
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(9px);
+  transition: opacity 220ms ease;
+}
+
+.profile-tile__reveal h3 {
+  margin-top: 0.6rem;
+  font-size: 1.2rem;
+}
+
+.profile-tile__reveal dt {
+  color: var(--color-mute);
+  font-size: 0.7rem;
+}
+
+.profile-tile__reveal dd {
+  overflow-wrap: anywhere;
+  color: var(--color-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+@media (hover: hover) {
+  .profile-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 38px rgba(31, 41, 55, 0.15);
+  }
+
+  .profile-tile:hover .profile-tile__art {
+    filter: blur(5px);
+    transform: scale(1.05);
+  }
+
+  .profile-tile:hover .profile-tile__reveal {
+    opacity: 1;
+  }
+}
+
+.profile-tile[open] .profile-tile__art {
+  filter: blur(5px);
+  transform: scale(1.05);
+}
+
+.profile-tile[open] .profile-tile__reveal,
+.profile-tile:focus-within .profile-tile__reveal {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tournament-orbit__ring::after,
+  .tournament-orbit__stop-inner,
+  .tournament-orbit__card {
+    animation: none;
+  }
+
+  .tournament-orbit__stop,
+  .calendar-match-card {
+    transition-duration: 0.01ms;
+  }
+
+  .profile-tile,
+  .profile-tile__art,
+  .profile-tile__reveal {
     transition-duration: 0.01ms;
   }
 }
