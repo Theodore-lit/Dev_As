@@ -309,7 +309,7 @@ async function CompetitionDynamic() {
         <div className="max-w-[1180px] mx-auto px-4">
           <div className="grid items-start gap-6 xl:grid-cols-12">
             <div className="min-w-0 overflow-hidden rounded-3xl border border-line bg-white p-4 shadow-xs sm:p-6 xl:col-span-7">
-              <TournamentBracket />
+              <TournamentBracket registrationOpen={Boolean(isCandidaturesOpen)} />
             </div>
             <div className="xl:col-span-5">
               <EditionCalendar entries={calendar} variant="sidebar" />

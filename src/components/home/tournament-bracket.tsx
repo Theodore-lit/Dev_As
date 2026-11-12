@@ -1,291 +1,240 @@
-'use client';
-
-import { useRef } from 'react';
+import Link from 'next/link';
 import {
-  TrophyIcon,
-  CrownIcon,
-  SwordsIcon,
   CheckIcon,
   CoinsIcon,
-  UtensilsIcon,
+  CrownIcon,
   DownloadIcon,
+  SwordsIcon,
+  TrophyIcon,
+  UtensilsIcon,
 } from '@/src/components/common/icons';
 
-export function TournamentBracket() {
-  const scrollRef = useRef<HTMLDivElement>(null);
+const stages = [
+  {
+    id: 'inscriptions',
+    step: 'Étape 01',
+    title: 'Phase d’inscription',
+    badge: 'Inscriptions',
+    items: [
+      { label: 'Dépôt des candidatures', count: 'En ligne' },
+      { label: 'Places visées', count: '30 candidats' },
+    ],
+    output: 'Les candidats retenus accèdent aux qualifications',
+    registration: true,
+  },
+  {
+    id: 'qualifications',
+    step: 'Étape 02',
+    title: 'Qualifications',
+    badge: '7 matchs',
+    items: [
+      { label: 'Groupes A & B', count: '30 cand.' },
+      { label: 'Barrage', count: '10 cand.' },
+    ],
+    output: '16 qualifiés retenus',
+  },
+  {
+    id: 'principale',
+    step: 'Étape 03',
+    title: 'Phase principale',
+    badge: '4 matchs',
+    items: [
+      { label: 'Tours 1 & 2', count: '16 → 13' },
+      { label: '16ᵉ & 8ᵉ de finale', count: '10 → 8' },
+    ],
+    output: '6 qualifiés pour les quarts',
+  },
+  {
+    id: 'quarts',
+    step: 'Étape 04',
+    title: 'Quarts de finale',
+    badge: '1 match',
+    items: [
+      { label: 'Confrontation Top 6', count: '6 cand.' },
+      { label: 'Ticket dernier carré', count: '4 places' },
+    ],
+    output: '4 demi-finalistes',
+  },
+  {
+    id: 'demis',
+    step: 'Étape 05',
+    title: 'Demi-finales',
+    badge: '1 match',
+    items: [
+      { label: 'Dernier carré', count: '4 cand.' },
+      { label: 'Match de podium', count: '3ᵉ place' },
+    ],
+    output: '2 finalistes pour le titre',
+  },
+  {
+    id: 'finale',
+    step: 'Étape 06',
+    title: 'Grande finale',
+    badge: 'Finale',
+    items: [
+      { label: 'Duel ultime au sommet', count: '2 finalistes' },
+      { label: 'Team Building H5', count: 'En direct' },
+    ],
+    output: '1 DevChampion sacré',
+    highlight: true,
+  },
+];
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const offset = direction === 'left' ? -280 : 280;
-      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-    }
-  };
-
-  const rounds = [
-    {
-      id: 'qualif',
-      step: 'Étape 01',
-      title: 'Qualifications',
-      matches: '7 matchs',
-      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
-      items: [
-        { label: 'Groupes A & B', count: '30 cand.' },
-        { label: 'Barrage ', count: '10 cand.' },
-      ],
-      output: '16 qualifiés retenus',
-      highlight: false,
-    },
-    {
-      id: 'principale',
-      step: 'Étape 02',
-      title: 'Phase Principale',
-      matches: '4 matchs',
-      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
-      items: [
-        { label: 'Tours 1 & 2 ', count: '16 → 13' },
-        { label: '16ᵉ & 8ᵉ de finale', count: '10 → 8' },
-      ],
-      output: '6 qualifiés pour les 1/4',
-      highlight: false,
-    },
-    {
-      id: 'quarts',
-      step: 'Étape 03',
-      title: 'Quarts de finale',
-      matches: '1 match',
-      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
-      items: [
-        { label: 'Confrontation Top 6', count: '6 cand.' },
-        { label: 'Ticket dernier carré', count: '4 places' },
-      ],
-      output: '4 demi-finalistes',
-      highlight: false,
-    },
-    {
-      id: 'demis',
-      step: 'Étape 04',
-      title: 'Demi-finales',
-      matches: '1 match',
-      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
-      items: [
-        { label: 'Dernier Carré', count: '4 cand.' },
-        { label: 'Match de Podium', count: '3ᵉ place' },
-      ],
-      output: '2 finalistes pour le titre',
-      highlight: false,
-    },
-    {
-      id: 'finale',
-      step: 'Étape 05',
-      title: 'Grande Finale',
-      matches: '1 match',
-      badgeColor: 'bg-orange-pale text-orange-dark border-orange/30',
-      items: [
-        { label: 'Duel Ultime au Sommet', count: '2 finalistes' },
-        { label: 'Team Building H5', count: 'Direct' },
-      ],
-      output: '1 DevChampion sacré',
-      highlight: true,
-    },
-  ];
-
+export function TournamentBracket({ registrationOpen }: { registrationOpen: boolean }) {
   return (
     <div className="w-full">
-      {/* En-tête épuré avec titre et flèches de navigation */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-line">
+      <div className="mb-6 flex flex-col items-start justify-between gap-3 border-b border-line pb-4 sm:flex-row sm:items-center">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-wider mb-1 border border-slate-200">
-            <SwordsIcon className="w-3.5 h-3.5 text-slate-600" />
-            Tableau du Tournoi · 14 Matchs
+          <div className="mb-1 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-700">
+            <SwordsIcon className="h-3.5 w-3.5 text-slate-600" />
+            Parcours du tournoi · 14 matchs
           </div>
-          <h3 className="font-heading font-extrabold text-xl sm:text-2xl text-ink">
-            Schéma officiel des éliminatoires
+          <h3 className="font-heading text-xl font-extrabold text-ink sm:text-2xl">
+            Les étapes vers le titre
           </h3>
-          <p className="text-xs sm:text-sm text-mute mt-0.5">
-            Progression façon tournoi, de 30 candidats jusqu&apos;au sacre ultime.
+          <p className="mt-0.5 text-xs text-mute sm:text-sm">
+            Des inscriptions au sacre du DevChampion.
           </p>
         </div>
 
-        {/* Boutons de navigation du scroll horizontal */}
-        <div className="flex items-center gap-2 shrink-0">
-          <a
-            href="/documents_officiels/CAHIER_DE_DEROULEMENT_DEVCHAMPION.pdf"
-            download="CAHIER_DE_DEROULEMENT_DEVCHAMPION.pdf"
-            aria-label="Télécharger le cahier de déroulement de la compétition"
-            title="Télécharger le cahier de déroulement"
-            className="inline-flex h-9 items-center gap-2 rounded-xl border border-green/20 bg-green-pale px-3 text-xs font-bold text-green-dark transition-colors hover:bg-green/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-dark"
-          >
-            <DownloadIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Déroulement PDF</span>
-          </a>
-          {/* <button
-            type="button"
-            onClick={() => scroll('left')}
-            className="w-9 h-9 rounded-xl bg-soft hover:bg-line border border-line flex items-center justify-center text-slate-600 hover:text-ink transition-colors cursor-pointer"
-            aria-label="Faire défiler vers la gauche"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => scroll('right')}
-            className="w-9 h-9 rounded-xl bg-soft hover:bg-line border border-line flex items-center justify-center text-slate-600 hover:text-ink transition-colors cursor-pointer"
-            aria-label="Faire défiler vers la droite"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button> */}
-        </div>
+        <a
+          href="/documents_officiels/CAHIER_DE_DEROULEMENT_DEVCHAMPION.pdf"
+          download="CAHIER_DE_DEROULEMENT_DEVCHAMPION.pdf"
+          aria-label="Télécharger le cahier de déroulement de la compétition"
+          title="Télécharger le cahier de déroulement"
+          className="inline-flex h-9 shrink-0 items-center gap-2 rounded-xl border border-green/20 bg-green-pale px-3 text-xs font-bold text-green-dark transition-colors hover:bg-green/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-dark"
+        >
+          <DownloadIcon className="h-4 w-4" />
+          <span>Déroulement PDF</span>
+        </a>
       </div>
 
-      {/* Conteneur horizontal avec scrollbar personnalisée */}
-      <div
-        ref={scrollRef}
-        className="custom-scrollbar overflow-x-auto pb-4 pt-1 scroll-smooth"
-      >
-        <div className="inline-flex items-center gap-2 min-w-max pr-4">
-          {rounds.map((round, idx) => (
-            <div key={round.id} className="flex items-center">
-              {/* Carte de phase au format réduit, inspirée des tableaux sportifs */}
-              <div
-                className={`w-[210px] h-[270px] rounded-2xl p-4 transition-all border flex flex-col justify-between ${
-                  round.highlight
-                    ? 'bg-gradient-to-b from-orange-pale/90 via-white to-orange-pale/40 border-orange shadow-md ring-2 ring-orange/20'
-                    : 'bg-white border-line hover:border-slate-300 shadow-xs'
+      <ol className="relative mx-auto max-w-3xl space-y-4 before:absolute before:bottom-8 before:left-5 before:top-8 before:w-0.5 before:bg-gradient-to-b before:from-green-light before:via-line before:to-orange/60 sm:space-y-5 sm:before:left-6">
+        {stages.map((stage, index) => {
+          const isRegistration = 'registration' in stage;
+          const isCurrent = isRegistration && registrationOpen;
+          const isFinal = 'highlight' in stage && stage.highlight;
+
+          return (
+            <li key={stage.id} className="relative flex items-start gap-3 sm:gap-5">
+              <span
+                className={`relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full border-4 border-white text-xs font-extrabold shadow-sm sm:h-12 sm:w-12 ${
+                  isCurrent
+                    ? 'bg-green text-white ring-4 ring-green-pale'
+                    : isFinal
+                      ? 'bg-orange text-white ring-4 ring-orange-pale'
+                      : 'bg-white text-green-dark ring-1 ring-line'
+                }`}
+                aria-hidden="true"
+              >
+                {String(index + 1).padStart(2, '0')}
+              </span>
+
+              <article
+                className={`min-w-0 flex-1 rounded-2xl border p-4 shadow-xs transition-shadow hover:shadow-card sm:p-5 ${
+                  isCurrent
+                    ? 'border-green/35 bg-gradient-to-br from-green-pale/70 via-white to-white ring-1 ring-green/10'
+                    : isFinal
+                      ? 'border-orange/40 bg-gradient-to-br from-orange-pale/80 via-white to-orange-pale/30'
+                      : 'border-line bg-white'
                 }`}
               >
-                {/* En-tête compact */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[0.68rem] uppercase font-bold tracking-wider text-slate-400">
-                      {round.step}
-                    </span>
-                    <span className={`text-[0.65rem] font-bold px-2 py-0.5 rounded-full border ${round.badgeColor}`}>
-                      {round.matches}
-                    </span>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[0.68rem] font-bold uppercase tracking-wider text-slate-400">
+                      {stage.step}
+                    </p>
+                    <h4 className="mt-0.5 font-heading text-base font-extrabold leading-tight text-ink sm:text-lg">
+                      {stage.title}
+                    </h4>
                   </div>
-
-                  <h4 className="font-heading font-extrabold text-ink text-sm sm:text-base leading-tight">
-                    {round.title}
-                  </h4>
+                  <span
+                    className={`shrink-0 rounded-full border px-2.5 py-1 text-[0.68rem] font-bold ${
+                      isCurrent
+                        ? 'border-green/25 bg-green-pale text-green-dark'
+                        : isFinal
+                          ? 'border-orange/30 bg-orange-pale text-orange-dark'
+                          : 'border-slate-200 bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    {isRegistration
+                      ? isCurrent
+                        ? 'Phase actuelle'
+                        : 'Candidatures fermées'
+                      : stage.badge}
+                  </span>
                 </div>
 
-                {/* Matchs / étapes sous forme de cellules façon bracket de football */}
-                <div className="space-y-1.5 my-auto">
-                  {round.items.map((it, i) => (
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {stage.items.map((item) => (
                     <div
-                      key={i}
-                      className="flex items-center justify-between gap-1.5 px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-200/80 text-xs"
+                      key={item.label}
+                      className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-2.5 text-xs"
                     >
-                      <span className="font-semibold text-slate-700 text-[0.72rem] truncate">
-                        {it.label}
-                      </span>
-                      <span className="shrink-0 px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[0.68rem] font-extrabold text-slate-900 shadow-2xs">
-                        {it.count}
+                      <span className="min-w-0 font-semibold text-slate-700">{item.label}</span>
+                      <span className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-1 text-[0.68rem] font-extrabold text-slate-900 shadow-2xs">
+                        {item.count}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                {/* Ligne d'issue / qualifiés */}
                 <div
-                  className={`w-full py-1.5 px-2.5 rounded-xl text-[0.72rem] font-bold flex items-center justify-center gap-1.5 shadow-2xs ${
-                    round.highlight
+                  className={`mt-3 flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-bold ${
+                    isFinal
                       ? 'bg-orange text-white'
-                      : 'bg-slate-100 text-slate-800 border border-slate-200'
+                      : isCurrent
+                        ? 'border border-green/15 bg-green-pale/60 text-green-dark'
+                        : 'border border-slate-200 bg-slate-100 text-slate-800'
                   }`}
                 >
-                  <CheckIcon className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{round.output}</span>
-                </div>
-              </div>
-
-              {/* Ligne de liaison façon bracket de football (NON VERT : gris/ardoise métallisé) */}
-              <div className="shrink-0 px-2 flex items-center justify-center text-slate-400">
-                <svg
-                  width="22"
-                  height="16"
-                  viewBox="0 0 22 16"
-                  fill="none"
-                  className="stroke-current text-slate-400"
-                >
-                  <path
-                    d="M1 8H18M18 8L12 2M18 8L12 14"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-          ))}
-
-          {/* Div après les étapes : Carte Trophée DEVCHAMPION réduite & calibrée */}
-          <div className="shrink-0">
-            <div className="w-[210px] h-[270px] rounded-2xl p-4 bg-gradient-to-b from-[#111827] via-[#1f2937] to-[#111827] text-white border-2 border-amber-400 shadow-xl flex flex-col justify-between text-center relative overflow-hidden">
-              {/* Effet halo d'ambiance doré */}
-              <div className="absolute -top-8 -right-8 w-24 h-24 bg-amber-400/20 rounded-full blur-xl pointer-events-none" />
-
-              {/* Badge d'en-tête */}
-              <div className="relative z-10">
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[0.62rem] font-extrabold uppercase tracking-widest bg-amber-400/20 text-amber-300 border border-amber-400/40">
-                  Podium Final
-                </span>
-
-                {/* Icône Trophée dorée */}
-                <div className="w-11 h-11 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center mx-auto my-2 text-amber-300 shadow-md">
-                  <TrophyIcon className="w-6 h-6 text-amber-400" />
+                  {isFinal ? (
+                    <TrophyIcon className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <CheckIcon className="h-4 w-4 shrink-0" />
+                  )}
+                  <span>{stage.output}</span>
                 </div>
 
-                <h4 className="font-heading font-extrabold text-sm sm:text-base text-white leading-tight tracking-wide">
-                  DEVCHAMPION
-                </h4>
-              </div>
+                {isRegistration && (
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs text-mute">
+                      {isCurrent
+                        ? 'Candidatez dès maintenant pour tenter votre chance.'
+                        : 'Suivez nos actualités pour connaître la prochaine ouverture.'}
+                    </p>
+                    {isCurrent && (
+                      <Link
+                        href="/candidacy"
+                        className="inline-flex min-h-10 items-center justify-center rounded-xl bg-orange px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-orange-dark"
+                      >
+                        Candidater
+                      </Link>
+                    )}
+                  </div>
+                )}
 
-              {/* Détail synthétique des récompenses */}
-              <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/10 text-left space-y-1 relative z-10 text-[0.7rem]">
-                <div className="flex items-center gap-1.5 text-white/90">
-                  <CoinsIcon className="w-3 h-3 text-amber-300 shrink-0" />
-                  <span className="font-bold text-amber-300">10 000 FCFA</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-white/80">
-                  <UtensilsIcon className="w-3 h-3 text-emerald-400 shrink-0" />
-                  <span>5 tickets resto</span>
-                </div>
-              </div>
-
-              {/* Pied de carte */}
-              <div className="py-1.5 px-2 rounded-xl bg-amber-400 text-ink font-bold text-[0.68rem] flex items-center justify-center gap-1 shadow-sm relative z-10">
-                <CrownIcon className="w-3 h-3 text-ink shrink-0" />
-                <span className="font-extrabold truncate">Team Building HighFive</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Résumé synthétique minimaliste sous le bracket */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 pt-3 border-t border-line text-center text-xs">
-        <div className="p-2 rounded-xl bg-soft/50 border border-line">
-          <span className="text-mute block text-[0.68rem]">1. Qualifications</span>
-          <strong className="text-ink text-xs sm:text-sm">30 → 16 candidats</strong>
-        </div>
-        <div className="p-2 rounded-xl bg-soft/50 border border-line">
-          <span className="text-mute block text-[0.68rem]">2. Phase Principale</span>
-          <strong className="text-ink text-xs sm:text-sm">16 → 6 candidats</strong>
-        </div>
-        <div className="p-2 rounded-xl bg-soft/50 border border-line">
-          <span className="text-mute block text-[0.68rem]">3. Quarts & Demis</span>
-          <strong className="text-ink text-xs sm:text-sm">6 → 2 finalistes</strong>
-        </div>
-        <div className="p-2 rounded-xl bg-orange-pale/70 border border-orange/20">
-          <span className="text-orange-dark block text-[0.68rem]">4. Grande Finale</span>
-          <strong className="text-orange-dark text-xs sm:text-sm">1 DevChampion</strong>
-        </div>
-      </div>
+                {isFinal && (
+                  <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl border border-amber-400/30 bg-slate-900 p-3 text-xs text-white">
+                    <div className="flex items-center gap-2">
+                      <CoinsIcon className="h-4 w-4 shrink-0 text-amber-300" />
+                      <span className="font-bold text-amber-300">10 000 FCFA</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <UtensilsIcon className="h-4 w-4 shrink-0 text-emerald-400" />
+                      <span>5 tickets resto</span>
+                    </div>
+                    <div className="col-span-2 flex items-center gap-2 border-t border-white/10 pt-2 font-bold text-amber-200">
+                      <CrownIcon className="h-4 w-4 shrink-0" />
+                      <span>DEVCHAMPION · Team Building HighFive</span>
+                    </div>
+                  </div>
+                )}
+              </article>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

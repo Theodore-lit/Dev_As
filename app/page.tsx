@@ -73,7 +73,9 @@ export default async function HomePage() {
 
           {/* Schéma officiel de déroulement (Arbre façon football / Ligue des Champions) */}
           <div className="bg-white rounded-3xl border border-line p-6 sm:p-8 md:p-10 shadow-xs">
-            <TournamentBracket />
+            <Suspense fallback={<TournamentBracketSkeleton />}>
+              <TournamentBracketDynamic />
+            </Suspense>
           </div>
         </div>
       </section>
@@ -93,6 +95,32 @@ export default async function HomePage() {
       <CtaSection />
     </div>
   );
+}
+
+function TournamentBracketSkeleton() {
+  return (
+    <div className="mx-auto max-w-3xl animate-pulse space-y-4" aria-hidden="true">
+      {Array.from({ length: 6 }, (_, index) => (
+        <div key={index} className="h-28 rounded-2xl bg-line/40" />
+      ))}
+    </div>
+  );
+}
+
+async function TournamentBracketDynamic() {
+  await io();
+  const supabase = await createClient();
+  const { data: openEdition, error } = await supabase
+    .from('editions')
+    .select('id')
+    .eq('candidatures_ouvertes', true)
+    .order('annee', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return <TournamentBracket registrationOpen={Boolean(openEdition)} />;
 }
 
 /** Squelette affiché pendant le streaming de l'édition active */
