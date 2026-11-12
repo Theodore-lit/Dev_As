@@ -16,9 +16,9 @@ const publicLinks = [
   { label: 'La compétition', href: '/competition' },
   { label: 'Éditions',       href: '/editions' },
   { label: 'Participants',   href: '/participants' },
-  { label: 'Résultats',      href: '/resultats' },
-  { label: 'Palmarès',       href: '/palmares' },
-  { label: 'Actualités',     href: '/actualites' },
+  // { label: 'Résultats',      href: '/resultats' },
+  // { label: 'Palmarès',       href: '/palmares' },
+  // { label: 'Actualités',     href: '/actualites' },
 ];
 
 const adminLinks = [
@@ -68,7 +68,7 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
         {/* Nav desktop */}
         <nav
           className={[
-            'items-center gap-0.5',
+            'flex-1 items-center justify-center gap-0.5',
             'hidden md:flex',
             open ? '!flex absolute left-0 right-0 top-full flex-col bg-white border-b border-line px-4 py-3 shadow-sm z-40' : '',
           ].join(' ')}
@@ -97,8 +97,6 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
           })}
         </nav>
 
-        <div className="flex-1" />
-
         {/* Auth */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
           {userName ? (
@@ -116,12 +114,12 @@ export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
             </>
           ) : role === 'public' ? (
             <>
-              <Link
+              {/* <Link
                 href="/connexion"
                 className="px-4 py-2 rounded-lg text-sm font-semibold text-ink hover:bg-soft transition-colors"
               >
                 Connexion
-              </Link>
+              </Link> */}
               <Link
                 href="/candidacy"
                 className="px-4 py-2 rounded-[10px] bg-orange !text-white text-sm font-bold hover:bg-orange-dark hover:!text-white transition-colors"

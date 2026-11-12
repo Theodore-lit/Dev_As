@@ -116,6 +116,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   // Match all routes except static files and API routes
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|public|logo.png|.*\\.png|.*\\.svg).*)',
+    '/((?!_next/static|_next/image|favicon.png|public|logo.png|.*\\.png|.*\\.svg).*)',
   ],
 };

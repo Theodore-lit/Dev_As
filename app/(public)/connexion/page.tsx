@@ -26,7 +26,7 @@ export default function ConnexionPage() {
             <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#041c13]/95 via-[#041c13]/55 to-[#041c13]/15" />
             <div className="mb-auto inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-2 text-xs font-semibold tracking-wide text-white backdrop-blur-sm">
               <span className="h-2 w-2 rounded-full bg-orange" />
-              QUESTION POUR UN DEVAS
+              Devenez LE DEVCHAMPION DE LA SAISON
             </div>
 
             <div className="max-w-lg text-white">

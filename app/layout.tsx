@@ -3,6 +3,7 @@ import { Montserrat, Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/src/components/common/header';
 import { Footer } from '@/src/components/common/footer';
+import { SiteLayout } from '@/src/components/common/site-layout';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -31,9 +32,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className="flex min-h-dvh flex-col">
-        <Header role="public" />
-        <main className="flex flex-1 flex-col">{children}</main>
-        <Footer />
+        <SiteLayout
+          header={<Header role="public" />}
+          footer={<Footer />}
+        >
+          {children}
+        </SiteLayout>
       </body>
     </html>
   );
