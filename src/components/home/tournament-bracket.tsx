@@ -17,7 +17,7 @@ interface TournamentStage {
   step: string;
   title: string;
   badge: string;
-  items: { label: string; count: string }[];
+  items: { label: string }[];
   output: string;
   registration?: boolean;
   highlight?: boolean;
@@ -30,8 +30,8 @@ const stages: TournamentStage[] = [
     title: 'Phase d’inscription',
     badge: 'Inscriptions',
     items: [
-      { label: 'Dépôt des candidatures', count: 'En ligne' },
-      { label: 'Places visées', count: '30 candidats' },
+      { label: 'Dépôt des candidatures' },
+      { label: 'Places visées'},
     ],
     output: 'Les candidats retenus accèdent aux qualifications',
     registration: true,
@@ -42,8 +42,8 @@ const stages: TournamentStage[] = [
     title: 'Qualifications',
     badge: '7 matchs',
     items: [
-      { label: 'Groupes A & B', count: '30 cand.' },
-      { label: 'Barrage', count: '10 cand.' },
+      { label: 'Groupes A & B' },
+      { label: 'Barrage' },
     ],
     output: '16 qualifiés retenus',
   },
@@ -53,8 +53,8 @@ const stages: TournamentStage[] = [
     title: 'Phase principale',
     badge: '4 matchs',
     items: [
-      { label: 'Tours 1 & 2', count: '16 → 13' },
-      { label: '16ᵉ & 8ᵉ de finale', count: '10 → 8' },
+      { label: 'Tours 1 & 2'},
+      { label: '16ᵉ & 8ᵉ de finale' },
     ],
     output: '6 qualifiés pour les quarts',
   },
@@ -64,8 +64,8 @@ const stages: TournamentStage[] = [
     title: 'Quarts de finale',
     badge: '1 match',
     items: [
-      { label: 'Confrontation Top 6', count: '6 cand.' },
-      { label: 'Ticket dernier carré', count: '4 places' },
+      { label: 'Confrontation entre 6 canditats', },
+      { label: 'Ticket dernier carré : Juste 4 places' },
     ],
     output: '4 demi-finalistes',
   },
@@ -75,8 +75,8 @@ const stages: TournamentStage[] = [
     title: 'Demi-finales',
     badge: '1 match',
     items: [
-      { label: 'Dernier carré', count: '4 cand.' },
-      { label: 'Match de podium', count: '3ᵉ place' },
+      { label: 'Dernier carré' },
+      { label: 'Match de podium pour avoir le 3eme' },
     ],
     output: '2 finalistes pour le titre',
   },
@@ -86,8 +86,8 @@ const stages: TournamentStage[] = [
     title: 'Grande finale',
     badge: 'Finale',
     items: [
-      { label: 'Duel ultime au sommet', count: '2 finalistes' },
-      { label: 'Team Building H5', count: 'En direct' },
+      { label: 'Duel ultime au sommet',  },
+      { label: 'Team Building H5',  },
     ],
     output: '1 DevChampion sacré',
     highlight: true,
@@ -215,9 +215,9 @@ export function TournamentBracket({ registrationOpen }: { registrationOpen: bool
                 className="flex min-w-0 flex-col items-start gap-1 rounded-lg border border-slate-200/80 bg-slate-50 px-2 py-2 text-[0.62rem] sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-xs"
               >
                 <span className="min-w-0 font-semibold leading-tight text-slate-700">{item.label}</span>
-                <span className="max-w-full shrink-0 truncate rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[0.58rem] font-extrabold text-slate-900 shadow-2xs sm:px-2 sm:py-1 sm:text-[0.68rem]">
+                {/* <span className="max-w-full shrink-0 truncate rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[0.58rem] font-extrabold text-slate-900 shadow-2xs sm:px-2 sm:py-1 sm:text-[0.68rem]">
                   {item.count}
-                </span>
+                </span> */}
               </div>
             ))}
           </div>

@@ -1069,12 +1069,30 @@
   line-height: 1.15;
 }
 
-.tournament-orbit__stop.is-current .tournament-orbit__number,
-.tournament-orbit__stop.is-selected .tournament-orbit__number {
+.tournament-orbit__stop.is-selected:not(.is-current) .tournament-orbit__number {
   background: var(--color-green);
   color: white;
   box-shadow: 0 0 0 5px rgba(3, 152, 70, 0.14), 0 8px 20px rgba(3, 152, 70, 0.22);
   scale: 1.1;
+}
+
+.tournament-orbit__stop.is-current .tournament-orbit__number {
+  background: #f3c58f;
+  color: #713f13;
+  box-shadow: 0 0 0 4px rgba(242, 104, 0, 0.12), 0 6px 16px rgba(154, 79, 10, 0.16);
+  scale: 1.08;
+}
+
+.tournament-orbit__current-badge {
+  border: 1px solid rgba(154, 79, 10, 0.16);
+  border-radius: 9999px;
+  background: #fff3e5;
+  padding: 0.12rem 0.38rem;
+  color: #854d0e;
+  font-size: 0.48rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .tournament-orbit__stop.is-final .tournament-orbit__number {
