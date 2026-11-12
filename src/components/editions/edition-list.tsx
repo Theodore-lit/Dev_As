@@ -1,4 +1,5 @@
 import { EditionCard } from './edition-card';
+import { EmptyState } from '@/src/components/ui/empty-state';
 import type { Database } from '@/src/types/database';
 
 type Edition = Database['public']['Tables']['editions']['Row'];
@@ -10,11 +11,25 @@ interface EditionListProps {
 export function EditionList({ editions }: EditionListProps) {
   if (editions.length === 0) {
     return (
-      <div className="empty">
-        <div className="ico mx-auto mb-3">📋</div>
-        <p className="font-semibold text-ink">Aucune édition disponible</p>
-        <p className="text-sm mute mt-1">Les éditions apparaîtront ici dès leur création.</p>
-      </div>
+      <EmptyState
+        title="Aucune édition disponible"
+        description="Les éditions apparaîtront ici dès leur création."
+        icon={
+          <svg
+            className="h-7 w-7"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M16 3v4M8 3v4M3 10h18M8 14h3m-3 3h7" />
+          </svg>
+        }
+      />
     );
   }
 

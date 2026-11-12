@@ -20,7 +20,7 @@ export function LoginForm() {
 
     try {
       const supabase = createClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -30,7 +30,41 @@ export function LoginForm() {
         return;
       }
 
-      router.push('/');
+      const { data: profile, error: profileError } = await supabase
+        .from('profils')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        console.error(profileError);
+        setError(
+          'Votre compte est connecté, mais aucun espace utilisateur ne lui est associé. Contactez un administrateur.',
+        );
+        return;
+      }
+
+      if (!profile) {
+        setError(
+          'Aucun profil utilisateur n’est associé à ce compte. Contactez un administrateur.',
+        );
+        return;
+      }
+
+      const dashboardPath =
+        profile.role === 'admin' || profile.role === 'super_admin'
+          ? '/admin'
+          : profile.role === 'participant'
+            ? '/participant'
+            : null;
+
+      if (!dashboardPath) {
+        setError('Aucun espace n’est associé au rôle de votre compte.');
+        return;
+      }
+
+      router.replace(dashboardPath);
+      router.refresh();
     } catch (err) {
       setError('Une erreur s\'est produite lors de la connexion.');
       console.error(err);

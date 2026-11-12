@@ -21,28 +21,11 @@ const publicLinks = [
   // { label: 'Actualités',     href: '/actualites' },
 ];
 
-const adminLinks = [
-  { label: 'Dashboard',    href: '/admin' },
-  { label: 'Éditions',     href: '/editions' },
-  { label: 'Candidatures', href: '/candidacy' },
-  { label: 'Participants', href: '/participants' },
-  { label: 'Résultats',    href: '/matchs' },
-];
-
-const participantLinks = [
-  { label: 'Mon espace', href: '/participant' },
-  { label: 'Mes matchs', href: '/matchs' },
-  { label: 'Palmarès',   href: '/palmares' },
-];
-
 export function Header({ role = 'public', userName, onLogout }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  const links =
-    role === 'admin'       ? adminLinks :
-    role === 'participant' ? participantLinks :
-    publicLinks;
+  const links = publicLinks;
 
   const isActive = (href: string) =>
     href === '/resultats'

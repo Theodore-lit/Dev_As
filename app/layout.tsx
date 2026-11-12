@@ -22,7 +22,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Question pour un DevAs',
   description: 'Une compétition intellectuelle de culture générale pour les jeunes talents',
-  icons: { icon: '/favicon.png' },
+  icons: {
+    icon: [{ url: '/favicon.png', type: 'image/png' }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
