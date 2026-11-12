@@ -1,5 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import {
+  CalendarMilestones,
+  formatEditionDate,
+  type EditionCalendarEntry,
+} from './edition-calendar';
 import { Badge } from '@/src/components/ui/badge';
 import type { Database } from '@/src/types/database';
 
@@ -7,6 +12,7 @@ type Edition = Database['public']['Tables']['editions']['Row'];
 
 interface EditionCardProps {
   edition: Edition;
+  calendar?: EditionCalendarEntry[];
 }
 
 const STATUS_MAP: Record<
@@ -24,22 +30,20 @@ const EDITION_IMAGE =
   'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80';
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatEditionDate(value, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export function EditionCard({ edition }: EditionCardProps) {
+export function EditionCard({ edition, calendar = [] }: EditionCardProps) {
   const status = STATUS_MAP[edition.statut] ?? { label: edition.statut, variant: 'default' as const };
+  const firstCalendarDate = calendar[0]?.date_match ?? edition.date_debut;
+  const lastCalendarDate = calendar[calendar.length - 1]?.date_match ?? edition.date_fin;
   const dateRange =
-    edition.date_debut && edition.date_fin
-      ? `${formatDate(edition.date_debut)} – ${formatDate(edition.date_fin)}`
-      : edition.date_debut
-        ? `À partir du ${formatDate(edition.date_debut)}`
-        : edition.date_fin
-          ? `Jusqu'au ${formatDate(edition.date_fin)}`
+    firstCalendarDate && lastCalendarDate
+      ? `${formatDate(firstCalendarDate)} – ${formatDate(lastCalendarDate)}`
+      : firstCalendarDate
+        ? `À partir du ${formatDate(firstCalendarDate)}`
+        : lastCalendarDate
+          ? `Jusqu'au ${formatDate(lastCalendarDate)}`
           : 'Dates à venir';
 
   return (
@@ -76,36 +80,28 @@ export function EditionCard({ edition }: EditionCardProps) {
           {edition.description || `Découvrez les temps forts et les résultats de l’édition ${edition.annee}.`}
         </p>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className="rounded-xl bg-soft/80 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-mute">
-              Calendrier
-            </p>
-            <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
-              <svg
-                className="h-4 w-4 shrink-0 text-green-dark"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="3" y="5" width="18" height="16" rx="2" />
-                <path d="M16 3v4M8 3v4M3 10h18" />
-              </svg>
-              <span className="truncate">{dateRange}</span>
-            </p>
-          </div>
+        <div className="mt-5">
+          {calendar.some((entry) => entry.repere) ? (
+            <>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-mute">
+                Grandes étapes officielles
+              </p>
+              <CalendarMilestones entries={calendar} className="mt-2" />
+            </>
+          ) : (
+            <div className="rounded-2xl bg-green-pale/50 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-green-dark">
+                Calendrier de l’édition
+              </p>
+              <p className="mt-1 text-sm font-bold text-ink">{dateRange}</p>
+            </div>
+          )}
 
-          <div className="rounded-xl bg-soft/80 p-3">
+          <div className="mt-3 flex items-center justify-between rounded-xl bg-soft/80 px-3 py-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-mute">
               Score maximum
             </p>
-            <p className="mt-1 text-sm font-bold text-ink">
-              {edition.score_max_defaut} points
-            </p>
+            <p className="text-sm font-bold text-ink">{edition.score_max_defaut} points</p>
           </div>
         </div>
 

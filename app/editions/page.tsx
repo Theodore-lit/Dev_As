@@ -2,7 +2,11 @@ import { Suspense } from 'react';
 import { io } from 'next/cache';
 import { createClient } from '@/src/utils/supabase/server';
 import { EditionList } from '@/src/components/editions/edition-list';
+import type { EditionCalendarEntry } from '@/src/components/editions/edition-calendar';
 import { ErrorState } from '@/src/components/ui/error-state';
+import type { Database } from '@/src/types/database';
+
+type Edition = Database['public']['Tables']['editions']['Row'];
 
 export const metadata = {
   title: 'Editions - Question pour un DevAs',
@@ -44,17 +48,48 @@ function EditionsSkeleton() {
 
 async function EditionsDynamic() {
   await io();
+  let editionRows: Edition[] = [];
+  let calendarsByEditionId: Record<string, EditionCalendarEntry[]> = {};
+
   try {
     const supabase = await createClient();
-    const { data: editions, error } = await supabase
+    const { data: editions, error: editionsError } = await supabase
       .from('editions')
       .select('*')
       .order('annee', { ascending: false });
 
-    if (error) throw error;
-    return <EditionList editions={editions ?? []} />;
+    if (editionsError) throw editionsError;
+
+    editionRows = editions ?? [];
+    let calendarRows: EditionCalendarEntry[] = [];
+
+    if (editionRows.length > 0) {
+      const { data, error: calendarError } = await supabase
+        .from('edition_calendrier')
+        .select('*')
+        .in('edition_id', editionRows.map((edition) => edition.id))
+        .order('ordre', { ascending: true });
+
+      if (calendarError) throw calendarError;
+      calendarRows = data ?? [];
+    }
+
+    calendarsByEditionId = calendarRows.reduce<Record<string, EditionCalendarEntry[]>>(
+      (calendars, entry) => {
+        (calendars[entry.edition_id] ??= []).push(entry);
+        return calendars;
+      },
+      {},
+    );
   } catch (error) {
     console.error(error);
     return <ErrorState title="Erreur" message="Impossible de charger les editions." />;
   }
+
+  return (
+    <EditionList
+      editions={editionRows}
+      calendarsByEditionId={calendarsByEditionId}
+    />
+  );
 }

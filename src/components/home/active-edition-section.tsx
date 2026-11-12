@@ -7,6 +7,7 @@ import {
   ChevronRightIcon,
   CheckIcon,
 } from '@/src/components/common/icons';
+import { formatEditionDate } from '@/src/components/editions/edition-calendar';
 import type { Database } from '@/src/types/database';
 
 type EditionRow = Database['public']['Tables']['editions']['Row'];
@@ -30,12 +31,19 @@ export function ActiveEditionSection({
 
   const isCandidaturesOpen = edition.candidatures_ouvertes || edition.statut === 'candidatures_ouvertes';
   const startDateFormatted = edition.date_debut
-    ? new Date(edition.date_debut).toLocaleDateString('fr-FR', {
+    ? formatEditionDate(edition.date_debut, {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
       })
     : 'À venir';
+  const endDateFormatted = edition.date_fin
+    ? formatEditionDate(edition.date_fin, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : 'À confirmer';
 
   return (
     <section className="py-16 md:py-20 bg-white">
@@ -138,6 +146,11 @@ export function ActiveEditionSection({
                     Lancement
                   </span>
                   <strong className="text-white font-semibold">{startDateFormatted}</strong>
+                </div>
+
+                <div className="flex justify-between items-center py-1 border-b border-white/10">
+                  <span className="text-white/70">Fin officielle</span>
+                  <strong className="text-white font-semibold">{endDateFormatted}</strong>
                 </div>
 
                 <div className="flex justify-between items-center py-1 border-b border-white/10">

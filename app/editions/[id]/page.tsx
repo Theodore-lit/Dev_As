@@ -3,6 +3,7 @@ import { io } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/src/utils/supabase/server';
 import { EditionDetail } from '@/src/components/editions/edition-detail';
+import type { EditionCalendarEntry } from '@/src/components/editions/edition-calendar';
 import { ErrorState } from '@/src/components/ui/error-state';
 import type { Database } from '@/src/types/database';
 
@@ -121,16 +122,23 @@ async function EditionDetailContent({
     participants: 0,
     matchs: 0,
   };
+  let calendar: EditionCalendarEntry[] = [];
   let statsError: unknown = null;
 
   try {
     const [
       { data: editionPhases, error: phasesError },
+      { data: editionCalendar, error: calendarError },
       { count: candidaturesCount, error: candidaturesError },
       { count: participantsCount, error: participantsError },
     ] = await Promise.all([
       supabase
         .from('phases')
+        .select('*')
+        .eq('edition_id', edition.id)
+        .order('ordre', { ascending: true }),
+      supabase
+        .from('edition_calendrier')
         .select('*')
         .eq('edition_id', edition.id)
         .order('ordre', { ascending: true }),
@@ -145,6 +153,7 @@ async function EditionDetailContent({
     ]);
 
     if (phasesError) throw phasesError;
+    if (calendarError) throw calendarError;
     if (candidaturesError) throw candidaturesError;
     if (participantsError) throw participantsError;
 
@@ -159,6 +168,7 @@ async function EditionDetailContent({
     }
 
     phases = editionPhases ?? [];
+    calendar = editionCalendar ?? [];
     stats = {
       candidatures: candidaturesCount ?? 0,
       participants: participantsCount ?? 0,
@@ -180,5 +190,12 @@ async function EditionDetailContent({
     );
   }
 
-  return <EditionDetail edition={edition} phases={phases} stats={stats} />;
+  return (
+    <EditionDetail
+      edition={edition}
+      phases={phases}
+      calendar={calendar}
+      stats={stats}
+    />
+  );
 }

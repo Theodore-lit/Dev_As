@@ -8,6 +8,12 @@ import {
   TrophyIcon,
   UsersIcon,
 } from '@/src/components/common/icons';
+import {
+  CalendarMilestones,
+  EditionCalendar,
+  formatEditionDate,
+  type EditionCalendarEntry,
+} from './edition-calendar';
 import { Badge } from '@/src/components/ui/badge';
 import { Card } from '@/src/components/ui/card';
 import type { Database } from '@/src/types/database';
@@ -18,6 +24,7 @@ type Phase = Database['public']['Tables']['phases']['Row'];
 interface EditionDetailProps {
   edition: Edition;
   phases: Phase[];
+  calendar: EditionCalendarEntry[];
   stats: {
     candidatures: number;
     participants: number;
@@ -43,15 +50,6 @@ const PHASE_LABELS: Record<Phase['type'], string> = {
   demi_finale: 'Demi-finales',
   finale: 'Finale',
 };
-
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
 
 function StatCard({
   label,
@@ -85,8 +83,11 @@ function StatCard({
   );
 }
 
-export function EditionDetail({ edition, phases, stats }: EditionDetailProps) {
+export function EditionDetail({ edition, phases, calendar, stats }: EditionDetailProps) {
   const status = STATUS_MAP[edition.statut];
+  const startDate = calendar[0]?.date_match ?? edition.date_debut;
+  const lastCalendarEntry = calendar[calendar.length - 1];
+  const endDate = lastCalendarEntry?.date_match ?? edition.date_fin;
 
   return (
     <div className="bg-soft/50 pb-14">
@@ -154,16 +155,31 @@ export function EditionDetail({ edition, phases, stats }: EditionDetailProps) {
               <div className="rounded-2xl border border-line bg-soft/50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-mute">Début</p>
                 <p className="mt-2 font-semibold capitalize text-ink">
-                  {edition.date_debut ? formatDate(edition.date_debut) : 'Date à confirmer'}
+                  {startDate
+                    ? formatEditionDate(startDate, {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })
+                    : 'Date à confirmer'}
                 </p>
               </div>
               <div className="rounded-2xl border border-line bg-soft/50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-mute">Fin</p>
                 <p className="mt-2 font-semibold capitalize text-ink">
-                  {edition.date_fin ? formatDate(edition.date_fin) : 'Date à confirmer'}
+                  {endDate
+                    ? formatEditionDate(endDate, {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })
+                    : 'Date à confirmer'}
                 </p>
               </div>
             </div>
+            <CalendarMilestones entries={calendar} className="mt-5" />
           </Card>
 
           <Card className="flex flex-col justify-between rounded-3xl bg-gradient-to-br from-orange-pale/60 to-white p-5 shadow-card sm:p-7">
@@ -194,6 +210,10 @@ export function EditionDetail({ edition, phases, stats }: EditionDetailProps) {
               )}
             </div>
           </Card>
+        </div>
+
+        <div className="mt-8">
+          <EditionCalendar entries={calendar} />
         </div>
 
         <section className="mt-12" aria-labelledby="phases-title">

@@ -3,6 +3,11 @@ import { Suspense } from 'react';
 import { io } from 'next/cache';
 import { createClient } from '@/src/utils/supabase/server';
 import { TournamentBracket } from '@/src/components/home/tournament-bracket';
+import {
+  EditionCalendar,
+  formatEditionDate,
+  type EditionCalendarEntry,
+} from '@/src/components/editions/edition-calendar';
 import { RewardsSection } from '@/src/components/home/rewards-section';
 import {
   TrophyIcon,
@@ -33,6 +38,12 @@ const REGIE_MEMBERS = [
   { name: 'Alapini Primous', role: 'Membre de Régie', initials: 'AP' },
   { name: 'Christelle ORONKPONDE', role: 'Membre de Régie et gestionnaire financière', initials: 'OC' },
 ];
+
+function formatCompetitionDate(value?: string | null) {
+  return value
+    ? formatEditionDate(value, { day: 'numeric', month: 'long', year: 'numeric' })
+    : 'Prochainement';
+}
 
 export default function CompetitionPage() {
   return (
@@ -71,18 +82,15 @@ async function CompetitionDynamic() {
     .limit(1)
     .maybeSingle();
 
-  let activeEdition = openEdition;
+  const { data: inProgressEdition } = await supabase
+    .from('editions')
+    .select('*')
+    .eq('statut', 'en_cours')
+    .order('annee', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  if (!activeEdition) {
-    const { data: inProgress } = await supabase
-      .from('editions')
-      .select('*')
-      .eq('statut', 'en_cours')
-      .order('annee', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    activeEdition = inProgress;
-  }
+  let activeEdition = openEdition ?? inProgressEdition;
 
   if (!activeEdition) {
     const { data: latest } = await supabase
@@ -113,6 +121,35 @@ async function CompetitionDynamic() {
   }
 
   const isCandidaturesOpen = activeEdition?.candidatures_ouvertes || activeEdition?.statut === 'candidatures_ouvertes';
+  let calendar: EditionCalendarEntry[] = [];
+
+  if (activeEdition) {
+    const { data, error } = await supabase
+      .from('edition_calendrier')
+      .select('*')
+      .eq('edition_id', activeEdition.id)
+      .order('ordre', { ascending: true });
+
+    if (error) throw error;
+    calendar = data ?? [];
+  }
+
+  if (
+    calendar.length === 0 &&
+    inProgressEdition &&
+    inProgressEdition.id !== activeEdition?.id
+  ) {
+    const { data, error } = await supabase
+      .from('edition_calendrier')
+      .select('*')
+      .eq('edition_id', inProgressEdition.id)
+      .order('ordre', { ascending: true });
+
+    if (error) throw error;
+    calendar = data ?? [];
+  }
+  const firstCalendarEntry = calendar[0];
+  const finalCalendarEntry = calendar[calendar.length - 1];
 
   return (
     <div className="flex flex-col bg-white">
@@ -265,6 +302,20 @@ async function CompetitionDynamic() {
         </div>
       </section>
 
+      {/* ── Schéma du tournoi et calendrier officiel ── */}
+      <section id="tableau" className="py-14 md:py-18 bg-white scroll-mt-12">
+        <div className="max-w-[1180px] mx-auto px-4">
+          <div className="grid items-start gap-6 xl:grid-cols-12">
+            <div className="min-w-0 overflow-hidden rounded-3xl border border-line bg-white p-4 shadow-xs sm:p-6 xl:col-span-7">
+              <TournamentBracket />
+            </div>
+            <div className="xl:col-span-5">
+              <EditionCalendar entries={calendar} variant="sidebar" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── 5. Modalités de participation, Frais & Membres de la Régie ── */}
       <section id="modalites" className="py-14 md:py-18 bg-white scroll-mt-12">
         <div className="max-w-[1180px] mx-auto px-4">
@@ -408,13 +459,18 @@ async function CompetitionDynamic() {
                     Lancement officiel
                   </span>
                   <strong className="text-white font-semibold">
-                    {activeEdition?.date_debut
-                      ? new Date(activeEdition.date_debut).toLocaleDateString('fr-FR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })
-                      : 'Prochainement'}
+                    {formatCompetitionDate(
+                      firstCalendarEntry?.date_match ?? activeEdition?.date_debut,
+                    )}
+                  </strong>
+                </div>
+
+                <div className="flex justify-between py-1 border-b border-white/10">
+                  <span className="text-white/75">Grande finale</span>
+                  <strong className="text-white font-semibold">
+                    {formatCompetitionDate(
+                      finalCalendarEntry?.date_match ?? activeEdition?.date_fin,
+                    )}
                   </strong>
                 </div>
 
@@ -468,15 +524,6 @@ async function CompetitionDynamic() {
       <div id="recompenses" className="scroll-mt-12">
         <RewardsSection />
       </div>
-
-      {/* ── 1. Schéma de déroulement façon tournoi (14 Matchs compacts) ── */}
-      <section id="tableau" className="py-14 md:py-18 bg-white scroll-mt-12">
-        <div className="max-w-[1180px] mx-auto px-4">
-          <div className="bg-white rounded-3xl border border-line p-6 sm:p-8 md:p-10 shadow-xs">
-            <TournamentBracket />
-          </div>
-        </div>
-      </section>
 
       
 

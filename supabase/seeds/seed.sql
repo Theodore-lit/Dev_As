@@ -19,8 +19,56 @@ INSERT INTO editions (annee, nom, description, statut, date_debut, date_fin, sco
 VALUES 
 (2024, 'Édition 2024', 'Édition archivée', 'archivee'::statut_edition, '2024-01-01', '2024-12-31', 100),
 (2025, 'Édition 2025', 'Édition terminée', 'terminee'::statut_edition, '2025-01-01', '2025-12-31', 100),
-(2026, 'Édition 2026', 'Édition en cours', 'en_cours'::statut_edition, '2026-01-01', NULL, 100),
+(2026, 'Édition 2026', 'Édition en cours', 'en_cours'::statut_edition, '2026-11-26 00:00:00 Africa/Porto-Novo', '2026-12-19 23:59:59 Africa/Porto-Novo', 100),
 (2027, 'Édition 2027', 'Édition avec candidatures ouvertes', 'candidatures_ouvertes'::statut_edition, '2027-01-01', NULL, 100);
+
+-- Calendrier officiel de l'édition 2026
+INSERT INTO edition_calendrier (
+  edition_id,
+  ordre,
+  date_match,
+  horaire,
+  intitule,
+  precision,
+  repere,
+  repere_date_fin
+)
+SELECT
+  e.id,
+  schedule.ordre,
+  schedule.date_match,
+  schedule.horaire,
+  schedule.intitule,
+  schedule.precision,
+  schedule.repere,
+  schedule.repere_date_fin
+FROM editions e
+CROSS JOIN (
+  VALUES
+    (1, DATE '2026-11-26', '12h30 – 13h30', 'Première qualification', 'Groupe A', 'Première qualification · 30 candidats', NULL::DATE),
+    (2, DATE '2026-11-26', '18h30 – 19h30', 'Première qualification', 'Groupe B', NULL, NULL::DATE),
+    (3, DATE '2026-11-30', '18h30 – 19h30', 'Barrage', '10 candidats', 'Barrage · 10 candidats', NULL::DATE),
+    (4, DATE '2026-12-01', '12h30 – 13h30', 'Deuxième qualification', 'Groupe A', 'Deuxième qualification · 26 candidats', NULL::DATE),
+    (5, DATE '2026-12-01', '18h30 – 19h30', 'Deuxième qualification', 'Groupe B', NULL, NULL::DATE),
+    (6, DATE '2026-12-03', '12h30 – 13h30', 'Troisième qualification', 'Groupe B', 'Troisième qualification · 20 candidats', NULL::DATE),
+    (7, DATE '2026-12-03', '18h30 – 19h30', 'Troisième qualification', 'Groupe A', NULL, NULL::DATE),
+    (8, DATE '2026-12-07', '18h30 – 19h30', 'Tour 1', 'Phase principale', 'Phase principale · 16 candidats au départ', DATE '2026-12-17'),
+    (9, DATE '2026-12-08', '18h30 – 19h30', 'Tour 2', 'Phase principale', NULL, NULL::DATE),
+    (10, DATE '2026-12-10', '18h30 – 19h30', 'Seizième de finale', 'Phase principale', NULL, NULL::DATE),
+    (11, DATE '2026-12-11', '18h30 – 19h30', 'Huitième de finale', 'Phase principale', NULL, NULL::DATE),
+    (12, DATE '2026-12-14', '18h30 – 19h30', 'Quart de finale', 'Phase principale', NULL, NULL::DATE),
+    (13, DATE '2026-12-17', '18h30 – 19h30', 'Demi-finale', 'Phase principale', NULL, NULL::DATE),
+    (14, DATE '2026-12-19', 'À confirmer', 'Grande finale', 'Finale', 'Grande finale · 2 finalistes · 1 DevChampion', NULL::DATE)
+) AS schedule(ordre, date_match, horaire, intitule, precision, repere, repere_date_fin)
+WHERE e.annee = 2026
+ON CONFLICT (edition_id, ordre) DO UPDATE SET
+  date_match = EXCLUDED.date_match,
+  horaire = EXCLUDED.horaire,
+  intitule = EXCLUDED.intitule,
+  precision = EXCLUDED.precision,
+  repere = EXCLUDED.repere,
+  repere_date_fin = EXCLUDED.repere_date_fin,
+  updated_at = NOW();
 
 -- Créer phases pour chaque édition
 INSERT INTO phases (edition_id, ordre, nom, type, nb_groupes, nb_qualifies_par_groupe, nb_barrage_par_groupe)

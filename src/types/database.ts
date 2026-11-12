@@ -321,6 +321,56 @@ export type Database = {
         }
         Relationships: []
       }
+      edition_calendrier: {
+        Row: {
+          created_at: string
+          date_match: string
+          edition_id: string
+          horaire: string
+          id: string
+          intitule: string
+          ordre: number
+          precision: string | null
+          repere: string | null
+          repere_date_fin: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date_match: string
+          edition_id: string
+          horaire: string
+          id?: string
+          intitule: string
+          ordre: number
+          precision?: string | null
+          repere?: string | null
+          repere_date_fin?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date_match?: string
+          edition_id?: string
+          horaire?: string
+          id?: string
+          intitule?: string
+          ordre?: number
+          precision?: string | null
+          repere?: string | null
+          repere_date_fin?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edition_calendrier_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       journal_activite: {
         Row: {
           action: string

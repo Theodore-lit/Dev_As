@@ -29,7 +29,7 @@ export function TournamentBracket() {
       badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
       items: [
         { label: 'Groupes A & B', count: '30 cand.' },
-        { label: 'Barrage (Seconde chance)', count: '10 cand.' },
+        { label: 'Barrage ', count: '10 cand.' },
       ],
       output: '16 qualifiés retenus',
       highlight: false,
@@ -41,10 +41,10 @@ export function TournamentBracket() {
       matches: '4 matchs',
       badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
       items: [
-        { label: 'Tours 1 & 2 (Groupe unique)', count: '16 → 13' },
+        { label: 'Tours 1 & 2 ', count: '16 → 13' },
         { label: '16ᵉ & 8ᵉ de finale', count: '10 → 8' },
       ],
-      output: '6 qualifiés pour les Quarts',
+      output: '6 qualifiés pour les 1/4',
       highlight: false,
     },
     {
@@ -68,7 +68,7 @@ export function TournamentBracket() {
       badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
       items: [
         { label: 'Dernier Carré', count: '4 cand.' },
-        { label: 'Match de Podium (3ᵉ place)', count: 'Récompensé' },
+        { label: 'Match de Podium', count: '3ᵉ place' },
       ],
       output: '2 finalistes pour le titre',
       highlight: false,
@@ -81,7 +81,7 @@ export function TournamentBracket() {
       badgeColor: 'bg-orange-pale text-orange-dark border-orange/30',
       items: [
         { label: 'Duel Ultime au Sommet', count: '2 finalistes' },
-        { label: 'Team Building HighFive', count: 'Direct' },
+        { label: 'Team Building H5', count: 'Direct' },
       ],
       output: '1 DevChampion sacré',
       highlight: true,

@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import type { Database } from '@/src/types/database';
 
-type Candidature = Database['public']['Tables']['candidatures']['Row'];
+type Edition = Database['public']['Tables']['editions']['Row'];
 
 interface EditionsTableProps {
-  editions: Candidature[];
+  editions: Edition[];
 }
 
 const statusColors: Record<Edition['statut'], string> = {

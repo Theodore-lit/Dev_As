@@ -2,7 +2,6 @@ import { createClient } from '@/src/utils/supabase/server';
 import { AdminStats } from '@/src/components/dashboard/admin/admin-stats';
 import { EditionsTable } from '@/src/components/dashboard/admin/editions-table';
 import { CandidaturesTable } from '@/src/components/dashboard/admin/candidatures-table';
-import { Card } from '@/src/components/ui/card';
 
 
 export const instant = false;
