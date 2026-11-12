@@ -40,46 +40,47 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleLogin} className="stack">
+    <form onSubmit={handleLogin} className="stack gap-5">
       {error && (
-        <div className="errbox" role="alert">
-          <span>⚠️</span>
-          <p className="text-sm">{error}</p>
+        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red" role="alert">
+          <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+            <circle cx="10" cy="10" r="7.5" />
+            <path d="M10 6.5v4m0 3h.01" />
+          </svg>
+          <p className="text-sm leading-5">{error}</p>
         </div>
       )}
 
       <Input
         label="Email"
         type="email"
-        placeholder="votre@email.com"
+        placeholder="nom@exemple.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        autoComplete="email"
         required
       />
 
       <Input
         label="Mot de passe"
         type="password"
-        placeholder="••••••••"
+        placeholder="Votre mot de passe"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        autoComplete="current-password"
         required
       />
 
       <Button
         type="submit"
         variant="primary"
-        size="md"
+        size="lg"
         loading={loading}
         disabled={loading}
-        className="w-full"
+        className="w-full !rounded-xl"
       >
-        Connexion
+        Se connecter
       </Button>
-
-      <p className="text-xs text-mute text-center">
-        Identifiants de démo disponibles sur la page d'accueil.
-      </p>
     </form>
   );
 }
